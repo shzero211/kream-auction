@@ -5,7 +5,7 @@ spring:
       path: /h2-console
 
   datasource:
-    url: jdbc:h2:~/local;MODE=MySQL;DATABASE_TO_LOWER=TRUE #mysql 모드 설정
+    url: jdbc:h2:mem:test;MODE=MySQL;DATABASE_TO_LOWER=TRUE #mysql 모드 설정
     username: sa
     password:
     driver-class-name: org.h2.Driver
