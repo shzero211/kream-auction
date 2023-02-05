@@ -2,3 +2,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+
+logging:
+  level:
+    site.shkrr: error
