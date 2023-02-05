@@ -16,3 +16,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect #DB에 전달하는 SQL 형식 지정
     hibernate:
       ddl-auto: create
+
+logging:
+  level:
+    site.shkrr: debug
