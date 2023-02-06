@@ -4,3 +4,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+sms:
+  api_key: ${sms_api_key}
+  secret_key: ${sms_secret_key}
