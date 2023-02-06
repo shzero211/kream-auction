@@ -20,28 +20,35 @@ public class UserApiController {
     private final UserService userService;
     private final SmsCertificationService smsCertificationService;
 
+    /*
+    * sms 인증 메세지 전송
+    * */
     @PostMapping("/sms")
     public ResponseEntity sendSms(@RequestBody String phoneNum){
         String phoneNumToStr=Utils.json.toMap(phoneNum).get("phoneNum").toString();
-        log.info(phoneNumToStr);
         smsCertificationService.sendTo(phoneNumToStr);
         return Utils.response.of("메세지 전송 성공!");
     }
-    @PostMapping("/sms/confirm")
-    public void smsConfirm(){
 
+    /*
+    * sms 인증 번호 검증
+    * */
+    @PostMapping("/sms/confirm")
+    public ResponseEntity smsConfirm(@RequestBody UserDto.UserSmsConfirmRequestDto requestDto){
+        smsCertificationService.verifyNum(requestDto.getPhoneNum(), requestDto.getCertificationNum());
+        return Utils.response.of("인증 성공");
     }
+
     /*
     회원 가입 요청
-    * request 정보 유효성검사
+    * request 정보 유효성 검사
     * 중복 이메일 검사
     * 중복 핸드폰 번호 검사
+    * 휴대폰 인증 번호 검사
     * */
     @PostMapping
     public ResponseEntity signUp(@Valid @RequestBody UserDto.UserSignUpRequestDto requestDto){
-
         userService.signUp(requestDto);
-
         return Utils.response.of("회원가입에 성공하였습니다.");
     }
 }

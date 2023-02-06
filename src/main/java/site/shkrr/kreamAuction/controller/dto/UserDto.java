@@ -28,7 +28,16 @@ public class UserDto {
         private String phoneNum;
 
         @NotBlank(message = "인증번호가 비어있습니다.")
-        private String phoneAuthNum;
+        private String certificationNum;
 
     }
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class UserSmsConfirmRequestDto{
+        private String phoneNum;
+        private String certificationNum;
+    }
+
 }

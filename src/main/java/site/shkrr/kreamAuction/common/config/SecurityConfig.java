@@ -17,7 +17,7 @@ public class SecurityConfig{
         http.csrf().disable()
                 .httpBasic().disable()
                 .authorizeRequests(x->
-                                 x.antMatchers("/user","/user/sms").permitAll()
+                                 x.antMatchers("/user","/user/sms","/user/sms/confirm").permitAll()
                                 .anyRequest().authenticated())
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         return http.build();

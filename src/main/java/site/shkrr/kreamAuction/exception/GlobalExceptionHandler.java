@@ -8,6 +8,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import site.shkrr.kreamAuction.common.utils.Utils;
+import site.shkrr.kreamAuction.exception.smsCertification.CertificationNumExpireException;
+import site.shkrr.kreamAuction.exception.smsCertification.CertificationNumNotMatchException;
+import site.shkrr.kreamAuction.exception.smsCertification.CertificationKeyIsNullException;
 import site.shkrr.kreamAuction.exception.user.DuplicateEmailException;
 import site.shkrr.kreamAuction.exception.user.DuplicatePhoneNumException;
 import site.shkrr.kreamAuction.exception.user.JsonToMapException;
@@ -55,5 +58,23 @@ public class GlobalExceptionHandler{
     public ResponseEntity handleMapToJsonException(MapToJsonException ex){
         log.debug(String.valueOf(ex));
         return  Utils.response.ofException(ex.getMessage());
+    }
+
+    @ExceptionHandler(CertificationNumNotMatchException.class)
+    public ResponseEntity handleSmsCertificationNumException(CertificationNumNotMatchException ex){
+        log.debug(String.valueOf(ex));
+        return Utils.response.ofException(ex.getMessage());
+    }
+
+    @ExceptionHandler(CertificationNumExpireException.class)
+    public ResponseEntity handleIsNotValidCertificationNum(CertificationNumExpireException ex){
+        log.debug(String.valueOf(ex));
+        return Utils.response.ofException(ex.getMessage());
+    }
+
+    @ExceptionHandler(CertificationKeyIsNullException.class)
+    public ResponseEntity handleIsNotValidKey(CertificationKeyIsNullException ex){
+        log.debug(String.valueOf(ex));
+        return Utils.response.ofException(ex.getMessage());
     }
 }

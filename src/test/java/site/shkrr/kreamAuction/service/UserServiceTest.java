@@ -20,7 +20,7 @@ class UserServiceTest {
 
     @Test
     public void signUpTest(){
-        UserDto.UserSignUpRequestDto requestDto=UserDto.UserSignUpRequestDto.builder().email("shzero211@naver.com").password("1234").phoneAuthNum("1234").phoneNum("01039229957").build();
+        UserDto.UserSignUpRequestDto requestDto=UserDto.UserSignUpRequestDto.builder().email("shzero211@naver.com").password("1234").certificationNum("1234").phoneNum("01039229957").build();
         User user=userService.signUp(requestDto);
         assertEquals(true,passwordEncoder.matches(requestDto.getPassword(),user.getPassword()));
     }
