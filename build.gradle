@@ -30,6 +30,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'net.nurigo:sdk:4.2.9'//cool sms
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'//redis
+	implementation 'io.jsonwebtoken:jjwt:0.9.1'//jwt
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.h2database:h2'
