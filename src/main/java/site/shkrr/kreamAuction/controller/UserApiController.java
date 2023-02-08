@@ -46,9 +46,15 @@ public class UserApiController {
     * 중복 핸드폰 번호 검사
     * 휴대폰 인증 번호 검사
     * */
-    @PostMapping
+    @PostMapping("/signUp")
     public ResponseEntity signUp(@Valid @RequestBody UserDto.UserSignUpRequestDto requestDto){
         userService.signUp(requestDto);
         return Utils.response.of("회원가입에 성공하였습니다.");
+    }
+
+    @PostMapping("/signIn")
+    public ResponseEntity signIn(@Valid @RequestBody UserDto.UserLoginRequestDto requestDto){
+        String jwtToken=userService.login(requestDto);
+        return Utils.response.of("로그인 성공 하였습니다.",jwtToken);
     }
 }

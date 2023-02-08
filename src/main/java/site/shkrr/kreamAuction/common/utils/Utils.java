@@ -2,6 +2,7 @@ package site.shkrr.kreamAuction.common.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import site.shkrr.kreamAuction.common.config.AppConfig;
@@ -24,6 +25,11 @@ public class Utils {
     public static class response{
         public static ResponseEntity of(String msg){
             return new ResponseEntity(map.of("msg",msg), HttpStatus.OK);
+        }
+        public static ResponseEntity of(String msg,String jwtToken){
+            HttpHeaders headers=new HttpHeaders();
+            headers.set("Authorization",jwtToken);
+            return new ResponseEntity(map.of("msg",msg),headers,HttpStatus.OK);
         }
         public static ResponseEntity ofException(Object msg){
             return new ResponseEntity(map.of("error_msg",msg), HttpStatus.BAD_REQUEST);
