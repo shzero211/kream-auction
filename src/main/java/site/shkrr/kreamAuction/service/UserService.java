@@ -3,6 +3,9 @@ package site.shkrr.kreamAuction.service;
 import io.jsonwebtoken.Jwt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,15 +15,12 @@ import site.shkrr.kreamAuction.domain.users.Role;
 import site.shkrr.kreamAuction.domain.users.User;
 import site.shkrr.kreamAuction.domain.users.UserRepository;
 import site.shkrr.kreamAuction.exception.smsCertification.CertificationNumExpireException;
-import site.shkrr.kreamAuction.exception.user.DuplicateEmailException;
-import site.shkrr.kreamAuction.exception.user.DuplicatePhoneNumException;
-import site.shkrr.kreamAuction.exception.user.LoginEmailHasNotEntityException;
-import site.shkrr.kreamAuction.exception.user.LoginPasswordNotMatchException;
+import site.shkrr.kreamAuction.exception.user.*;
 import site.shkrr.kreamAuction.service.certification.RedisCertificationService;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService{
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserRepository userRepository;
 
@@ -86,6 +86,5 @@ public class UserService {
         //JWT AccessToken,RefreshToken 발급
         return jwtAuthProvider.createToken(loginUser.getId(),loginUser.getRole());
     }
-
 
 }
