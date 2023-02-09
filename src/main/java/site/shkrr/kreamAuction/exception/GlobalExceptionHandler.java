@@ -87,4 +87,17 @@ public class GlobalExceptionHandler{
         return Utils.response.ofException(ex.getMessage());
     }
 
+    @ExceptionHandler(LoginRefreshNotFoundUser.class)
+    public ResponseEntity handleLoginRefreshNotFoundUser(LoginRefreshNotFoundUser ex){
+        log.debug(String.valueOf(ex));
+        return Utils.response.ofException(ex.getMessage());
+    }
+
+    @ExceptionHandler(RefreshTokenIsNotValid.class)
+    public ResponseEntity handleRefreshTokenIsNotValid(RefreshTokenIsNotValid ex){
+        log.debug(String.valueOf(ex));
+        return Utils.response.ofException(ex.getMessage());
+    }
+
+
 }

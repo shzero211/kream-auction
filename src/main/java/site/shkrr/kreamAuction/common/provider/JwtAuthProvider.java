@@ -8,32 +8,36 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
-import site.shkrr.kreamAuction.domain.users.Role;
+import site.shkrr.kreamAuction.common.constant.TokenNameCons;
+import site.shkrr.kreamAuction.common.constant.TokenValidTimeCons;
+import site.shkrr.kreamAuction.domain.token.refreshToken.RefreshTokenRedisRepository;
+import site.shkrr.kreamAuction.domain.user.Role;
 import site.shkrr.kreamAuction.service.UserAuthDetailService;
-import site.shkrr.kreamAuction.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
-import java.util.Optional;
-import java.util.zip.DataFormatException;
+import java.util.HashMap;
+import java.util.Map;
+
 @RequiredArgsConstructor
 @Component
 public class JwtAuthProvider {
     @Value("${jwt.secret_key}")
     private String jwtSecretKey;
 
-    private static final Long tokenValidTime=30*60*1000L;
 
     private final UserAuthDetailService userAuthDetailService;
 
-    public String createToken(Long userId, Role role){
+    private final RefreshTokenRedisRepository refreshTokenRedisRepository;
+
+    //AccessToken 생성
+    public String createAccessToken(Long userId, Role role){
         Date now=new Date();
         Claims claims= Jwts.claims()
-                .setSubject(userId.toString())//JWT body 에 sub:userId 삽입
+                .setSubject(String.valueOf(userId))//JWT body 에 sub:userId 삽입
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime()+tokenValidTime));
+                .setExpiration(new Date(now.getTime()+ TokenValidTimeCons.ACCESS_VALID_TIME.getTime()));
         claims.put("role",role);// role: {role} 사입
 
 
@@ -42,17 +46,50 @@ public class JwtAuthProvider {
                 .signWith(SignatureAlgorithm.HS256,jwtSecretKey)
                 .compact();
     }
+
+    //UserId 받아서 RefreshToken 생성
+    public String createRefreshToken(Long userId){
+        Date now=new Date();
+        Claims claims=Jwts.claims()
+                .setSubject(String.valueOf(userId))
+                .setExpiration(new Date(now.getTime()+TokenValidTimeCons.REFRESH_VALID_TIME.getTime()))
+                .setIssuedAt(now);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .signWith(SignatureAlgorithm.HS256,jwtSecretKey)
+                .compact();
+    }
+
+    //두가지 토큰 생성후 Refresh Token 은 Redis 에 저장하고 Map 에 담아서 return
+    public Map<String,String> createToken(Long userId,Role userRole){
+        String accessToken=createAccessToken(userId,userRole);
+        String refreshToken=createRefreshToken(userId);
+        //JWT AccessToken,RefreshToken 발급
+        Map<String,String> tokenMap=new HashMap<>();
+        tokenMap.put(TokenNameCons.ACCESS.getName(),accessToken);
+        tokenMap.put(TokenNameCons.REFRESH.getName(),refreshToken);
+        refreshTokenRedisRepository.save(refreshToken,userId,TokenValidTimeCons.REFRESH_VALID_TIME.getTime());
+        return tokenMap;
+    }
+
     //Request 의 Header 에서 AccessToken 추출
     public String getAccessToken(HttpServletRequest request) {
-        return  request.getHeader("Authorization");
+        return  request.getHeader(TokenNameCons.ACCESS.getName());
     }
-    public Claims getClaims(String accessToken){
-        return Jwts.parser().setSigningKey(jwtSecretKey).parseClaimsJws(accessToken).getBody();
+
+    //Request 의 Header 에서 RefreshToken 추출
+    public String getRefreshToken(HttpServletRequest request) {
+        return  request.getHeader(TokenNameCons.REFRESH.getName());
+    }
+
+    public Claims getClaims(String token){
+        return Jwts.parser().setSigningKey(jwtSecretKey).parseClaimsJws(token).getBody();
     }
 
     //AccessToken 이 만료 되었는지 확인
-    public boolean isValid(String accessToken) {
-        return getClaims(accessToken).getExpiration().after(new Date());
+    public boolean isValid(String token) {
+        return getClaims(token).getExpiration().after(new Date());
     }
 
     //AccessToken 정보를 통한 사용자 로그인 객체 생성
@@ -61,4 +98,5 @@ public class JwtAuthProvider {
         UserDetails userDetails=userAuthDetailService.loadUserByUsername(userId);
         return new UsernamePasswordAuthenticationToken(userDetails,"",userDetails.getAuthorities());
     }
+
 }

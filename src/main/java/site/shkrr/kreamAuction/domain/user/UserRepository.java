@@ -1,4 +1,4 @@
-package site.shkrr.kreamAuction.domain.users;
+package site.shkrr.kreamAuction.domain.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -1,11 +1,10 @@
-package site.shkrr.kreamAuction.domain.users;
+package site.shkrr.kreamAuction.domain.user;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
 import site.shkrr.kreamAuction.domain.BaseTimeEntity;
 
 import javax.persistence.Column;

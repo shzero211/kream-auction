@@ -26,11 +26,15 @@ public class Utils {
         public static ResponseEntity of(String msg){
             return new ResponseEntity(map.of("msg",msg), HttpStatus.OK);
         }
-        public static ResponseEntity of(String msg,String jwtToken){
+
+        public static ResponseEntity of(String msg,Map<String,String> tokenMap){
             HttpHeaders headers=new HttpHeaders();
-            headers.set("Authorization",jwtToken);
+            for(String key: tokenMap.keySet()){
+                headers.add(key,tokenMap.get(key));
+            }
             return new ResponseEntity(map.of("msg",msg),headers,HttpStatus.OK);
         }
+
         public static ResponseEntity ofException(Object msg){
             return new ResponseEntity(map.of("error_msg",msg), HttpStatus.BAD_REQUEST);
         }

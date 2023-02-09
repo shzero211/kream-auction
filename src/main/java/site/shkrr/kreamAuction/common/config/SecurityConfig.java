@@ -26,7 +26,7 @@ public class SecurityConfig{
         http.csrf().disable()
                 .httpBasic().disable()
                 .authorizeRequests(x->
-                                 x.antMatchers("/user/signIn","/user/signUp","/user/sms","/user/sms/confirm").anonymous()
+                                 x.antMatchers("/user/signIn","/user/signUp","/user/sms","/user/sms/confirm","/user/signIn/refresh").anonymous()
                                          .antMatchers("/h2-console/**").permitAll()
                                 .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
