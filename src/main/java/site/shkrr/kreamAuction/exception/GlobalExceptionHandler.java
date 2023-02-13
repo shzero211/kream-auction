@@ -11,10 +11,7 @@ import site.shkrr.kreamAuction.common.utils.Utils;
 import site.shkrr.kreamAuction.exception.smsCertification.CertificationNumExpireException;
 import site.shkrr.kreamAuction.exception.smsCertification.CertificationNumNotMatchException;
 import site.shkrr.kreamAuction.exception.smsCertification.CertificationKeyIsNullException;
-import site.shkrr.kreamAuction.exception.user.DuplicateEmailException;
-import site.shkrr.kreamAuction.exception.user.DuplicatePhoneNumException;
-import site.shkrr.kreamAuction.exception.user.JsonToMapException;
-import site.shkrr.kreamAuction.exception.user.MapToJsonException;
+import site.shkrr.kreamAuction.exception.user.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -67,14 +64,40 @@ public class GlobalExceptionHandler{
     }
 
     @ExceptionHandler(CertificationNumExpireException.class)
-    public ResponseEntity handleIsNotValidCertificationNum(CertificationNumExpireException ex){
+    public ResponseEntity handleCertificationNumExpireException(CertificationNumExpireException ex){
         log.debug(String.valueOf(ex));
         return Utils.response.ofException(ex.getMessage());
     }
 
     @ExceptionHandler(CertificationKeyIsNullException.class)
-    public ResponseEntity handleIsNotValidKey(CertificationKeyIsNullException ex){
+    public ResponseEntity handleCertificationKeyIsNullException(CertificationKeyIsNullException ex){
         log.debug(String.valueOf(ex));
         return Utils.response.ofException(ex.getMessage());
     }
+
+    @ExceptionHandler(LoginEmailHasNotEntityException.class)
+    public ResponseEntity handleLoginEmailHasNotEntityException(LoginEmailHasNotEntityException ex){
+        log.debug(String.valueOf(ex));
+        return Utils.response.ofException(ex.getMessage());
+    }
+
+    @ExceptionHandler(LoginPasswordNotMatchException.class)
+    public ResponseEntity handleLoginPasswordNotMatchException(LoginPasswordNotMatchException ex){
+        log.debug(String.valueOf(ex));
+        return Utils.response.ofException(ex.getMessage());
+    }
+
+    @ExceptionHandler(LoginRefreshNotFoundUser.class)
+    public ResponseEntity handleLoginRefreshNotFoundUser(LoginRefreshNotFoundUser ex){
+        log.debug(String.valueOf(ex));
+        return Utils.response.ofException(ex.getMessage());
+    }
+
+    @ExceptionHandler(RefreshTokenIsNotValid.class)
+    public ResponseEntity handleRefreshTokenIsNotValid(RefreshTokenIsNotValid ex){
+        log.debug(String.valueOf(ex));
+        return Utils.response.ofException(ex.getMessage());
+    }
+
+
 }

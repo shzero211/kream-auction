@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import site.shkrr.kreamAuction.controller.dto.UserDto;
-import site.shkrr.kreamAuction.domain.users.User;
+import site.shkrr.kreamAuction.domain.user.User;
 
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest

@@ -40,4 +40,19 @@ public class UserDto {
         private String certificationNum;
     }
 
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class UserLoginRequestDto {
+
+        @NotBlank(message = "이메일(을)를 입력해주세요.")
+        @Email(message = "올바른 형식의 이메일 주소를 입력해주세요.")
+        private String email;
+
+        @NotBlank(message = "비밀번호(을)를 입력해주세요.")
+        @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*\\W).{8,16}$",message = "영문,특수문자,숫자가1개이상 있는 8~16자리 비밀번호를 입력해주세요.")
+        private String password;
+
+    }
 }

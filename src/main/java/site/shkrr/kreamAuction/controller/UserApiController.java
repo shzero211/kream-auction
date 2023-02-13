@@ -1,6 +1,5 @@
 package site.shkrr.kreamAuction.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +10,7 @@ import site.shkrr.kreamAuction.service.UserService;
 import site.shkrr.kreamAuction.service.certification.SmsCertificationService;
 
 import javax.validation.Valid;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -25,7 +25,7 @@ public class UserApiController {
     * */
     @PostMapping("/sms")
     public ResponseEntity sendSms(@RequestBody String phoneNum){
-        String phoneNumToStr=Utils.json.toMap(phoneNum).get("phoneNum").toString();
+        String phoneNumToStr=String.valueOf(Utils.json.toMap(phoneNum).get("phoneNum"));
         smsCertificationService.sendTo(phoneNumToStr);
         return Utils.response.of("메세지 전송 성공!");
     }
@@ -46,9 +46,29 @@ public class UserApiController {
     * 중복 핸드폰 번호 검사
     * 휴대폰 인증 번호 검사
     * */
-    @PostMapping
+    @PostMapping("/signUp")
     public ResponseEntity signUp(@Valid @RequestBody UserDto.UserSignUpRequestDto requestDto){
         userService.signUp(requestDto);
         return Utils.response.of("회원가입에 성공하였습니다.");
+    }
+
+    /*
+    * 로그인 입력에 대한 로그인 요청 처리
+    * AccessToken,RefreshToken 발급
+    */
+    @PostMapping("/signIn")
+    public ResponseEntity signIn(@Valid @RequestBody UserDto.UserLoginRequestDto requestDto){
+        Map<String,String> tokenMap=userService.login(requestDto);
+        return Utils.response.of("로그인 성공 하였습니다.",tokenMap);
+    }
+
+    /*
+    * AccessToken 만료시 RefreshToken 을 이용한 재발급 요청 처리
+    * */
+    @PostMapping("/signIn/refresh")
+    public ResponseEntity signInRefresh(@RequestHeader("refresh_token") String refreshToken){
+        log.info(refreshToken);
+        Map<String,String>tokenMap=userService.loginRefresh(refreshToken);
+        return Utils.response.of("새로운 Access Token 발급 을 완료하였습니다.",tokenMap);
     }
 }

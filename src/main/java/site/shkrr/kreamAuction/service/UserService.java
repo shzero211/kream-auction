@@ -1,25 +1,34 @@
 package site.shkrr.kreamAuction.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import site.shkrr.kreamAuction.common.constant.TokenNameCons;
+import site.shkrr.kreamAuction.common.provider.JwtAuthProvider;
 import site.shkrr.kreamAuction.controller.dto.UserDto;
-import site.shkrr.kreamAuction.domain.users.User;
-import site.shkrr.kreamAuction.domain.users.UserRepository;
+import site.shkrr.kreamAuction.domain.user.Role;
+import site.shkrr.kreamAuction.domain.user.User;
+import site.shkrr.kreamAuction.domain.user.UserRepository;
 import site.shkrr.kreamAuction.exception.smsCertification.CertificationNumExpireException;
-import site.shkrr.kreamAuction.exception.user.DuplicateEmailException;
-import site.shkrr.kreamAuction.exception.user.DuplicatePhoneNumException;
+import site.shkrr.kreamAuction.exception.user.*;
+import site.shkrr.kreamAuction.service.authorization.JwtAuthRedisService;
 import site.shkrr.kreamAuction.service.certification.RedisCertificationService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService{
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserRepository userRepository;
 
     private final RedisCertificationService redisCertificationService;
+
+    private final JwtAuthProvider jwtAuthProvider;
+
+    private final JwtAuthRedisService jwtAuthRedisService;
 
     @Transactional(readOnly = true)
     public boolean checkEmailDuplicated(String email){
@@ -31,9 +40,14 @@ public class UserService {
         return userRepository.existsByPhoneNum(phoneNum);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     private boolean checkCertificationNumIsValid(String phoneNum,String certificationNum) {
         return redisCertificationService.verifyCertificationNum(phoneNum,certificationNum)==false;
+    }
+
+    @Transactional(readOnly = true)
+    private boolean checkLoginPasswordMatch(String loginPassword,String dbPassword) {
+        return bCryptPasswordEncoder.matches(loginPassword,dbPassword);
     }
 
     @Transactional
@@ -58,9 +72,42 @@ public class UserService {
                         .email(requestDto.getEmail())
                         .password(bCryptPasswordEncoder.encode(requestDto.getPassword()))
                         .phoneNum(requestDto.getPhoneNum())
+                        .role(Role.ROLE_USER)
                 .build());
     }
 
 
+    public Map login(UserDto.UserLoginRequestDto requestDto) {
 
+        User loginUser=userRepository.findByEmail(requestDto.getEmail()).orElseThrow(()->new LoginEmailHasNotEntityException("해당 이메일을 가진 회원은 존재하지 않습니다."));
+
+        if(!checkLoginPasswordMatch(requestDto.getPassword(),loginUser.getPassword())){
+            throw new LoginPasswordNotMatchException("비밀번호가 일치하지 않습니다.");
+        }
+
+        //JWT AccessToken,RefreshToken 발급
+        Map<String,String> tokenMap=jwtAuthProvider.createToken(loginUser.getId(),loginUser.getRole());
+
+        return tokenMap;
+    }
+
+    //Refresh 토큰 유효성을 검사하고 새로운 AccessToken  발급
+    public Map loginRefresh(String refreshToken) {
+
+        //Redis 를 이용한 유효성 검사
+        if(!jwtAuthRedisService.isValidRefreshToken(refreshToken)){
+            throw new RefreshTokenIsNotValid("해당 계정의 Refresh Token 은 변경 되었습니다.");
+        }
+
+        Long userId= jwtAuthRedisService.getUserId(refreshToken);
+        //Token 생성시 DB 와의 정합성을 위한 DB 정보 추출
+        User user=userRepository.findById(userId).orElseThrow(()->new LoginRefreshNotFoundUser("login Refresh 과정중 회원 정보를 찾지 못하였습니다."));
+
+        //새로운 AccessToken 발급
+        String newAccessToken=jwtAuthProvider.createAccessToken(user.getId(),user.getRole());
+        Map<String,String> map=new HashMap<>();
+        map.put(TokenNameCons.ACCESS.getName(),newAccessToken);
+        map.put(TokenNameCons.REFRESH.getName(),refreshToken);
+        return map;
+    }
 }
