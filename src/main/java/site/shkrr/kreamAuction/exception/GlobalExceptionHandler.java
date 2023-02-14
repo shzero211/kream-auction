@@ -99,5 +99,22 @@ public class GlobalExceptionHandler{
         return Utils.response.ofException(ex.getMessage());
     }
 
+    @ExceptionHandler(EmailNotSignUpException.class)
+    public ResponseEntity handleEmailNotSignUpException(EmailNotSignUpException ex){
+        log.debug(String.valueOf(ex));
+        return Utils.response.ofException(ex.getMessage());
+    }
+
+    @ExceptionHandler(ChangePasswordUserNotFoundException.class)
+    public ResponseEntity handleChangePasswordUserNotFoundException(ChangePasswordUserNotFoundException ex){
+        log.debug(String.valueOf(ex));
+        return Utils.response.ofException(ex.getMessage());
+    }
+
+    @ExceptionHandler( BeforePasswordNotMatchException.class)
+    public ResponseEntity handleBeforePasswordNotMatchException(BeforePasswordNotMatchException ex){
+        log.debug(String.valueOf(ex));
+        return Utils.response.ofException(ex.getMessage());
+    }
 
 }
