@@ -55,4 +55,35 @@ public class UserDto {
         private String password;
 
     }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class VerifyCertificationForPasswordRequest{
+
+        @NotBlank(message = "이메일(을)를 입력해주세요.")
+        @Email(message = "올바른 형식의 이메일 주소를 입력해주세요.")
+        private String email;
+        @NotBlank(message="인증번호(을)를 입력해주세요.")
+        String certificationNum;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ChangePasswordRequest{
+
+        @NotBlank(message = "이메일(을)를 입력해주세요.")
+        @Email(message = "올바른 형식의 이메일 주소를 입력해주세요.")
+        private String email;
+
+        @NotBlank(message = "이전 비밀번호(을)를 입력해주세요.")
+        @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*\\W).{8,16}$",message = "영문,특수문자,숫자가1개이상 있는 8~16자리 비밀번호를 입력해주세요.")
+        private String beforePassword;
+
+        @NotBlank(message = "변경 비밀번호(을)를 입력해주세요.")
+        @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*\\W).{8,16}$",message = "영문,특수문자,숫자가1개이상 있는 8~16자리 비밀번호를 입력해주세요.")
+        private String newPassword;
+    }
+
 }

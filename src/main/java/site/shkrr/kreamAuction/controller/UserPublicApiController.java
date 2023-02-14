@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import site.shkrr.kreamAuction.common.utils.Utils;
 import site.shkrr.kreamAuction.controller.dto.UserDto;
 import site.shkrr.kreamAuction.service.UserService;
+import site.shkrr.kreamAuction.service.certification.EmailCertificationService;
 import site.shkrr.kreamAuction.service.certification.SmsCertificationService;
 
 import javax.validation.Valid;
@@ -19,6 +20,8 @@ import java.util.Map;
 public class UserPublicApiController {
     private final UserService userService;
     private final SmsCertificationService smsCertificationService;
+
+    private final EmailCertificationService emailCertificationService;
 
     /*
     * sms 인증 메세지 전송
@@ -70,5 +73,40 @@ public class UserPublicApiController {
         log.info(refreshToken);
         Map<String,String>tokenMap=userService.loginRefresh(refreshToken);
         return Utils.response.of("새로운 Access Token 발급 을 완료하였습니다.",tokenMap);
+    }
+
+    /*
+    * 비밀번호 찾기 (페이지로 이동)
+    * */
+    @GetMapping("/find-password")
+    public ResponseEntity findPassword(){
+    return Utils.response.of("비밀번호 찾기 페이지로 이동");
+    }
+
+    /*
+    * 비밀번호 찾기 (입력된 이메일로 인증번호 발급)
+    *  */
+    @PostMapping("/find-password")
+    public ResponseEntity sendCertificationForPassword(@RequestBody String email){
+        emailCertificationService.sendCertificationForPassword(email);
+        return Utils.response.of("비밀번호 찾기 인증번호 발급 성공");
+    }
+
+    /*
+    * 비밀번호 찾기 (인증번호 확인 후 삭제)
+    * */
+    @PostMapping("/find-password/verify")
+    public ResponseEntity verifyCertificationForPassword(@Valid @RequestBody UserDto.VerifyCertificationForPasswordRequest requestDto){
+        emailCertificationService.verifyCertificationNum(requestDto);
+        return Utils.response.of("비밀번호 찾기 이메일 인증 성공");
+    }
+
+    /*
+    * 비밀번호 찾기(이전 비밀번호 일치시 비밀번호 변경)
+    * */
+    @PostMapping("/find-password/change")
+    public ResponseEntity afterCertificationChangePassword(@Valid @RequestBody UserDto.ChangePasswordRequest requestDto){
+        userService.changePassword(requestDto);
+        return Utils.response.of("비밀번호 변경 성공");
     }
 }

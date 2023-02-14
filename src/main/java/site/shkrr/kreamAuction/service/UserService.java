@@ -76,7 +76,7 @@ public class UserService{
                 .build());
     }
 
-
+    @Transactional(readOnly = true)
     public Map login(UserDto.UserLoginRequestDto requestDto) {
 
         User loginUser=userRepository.findByEmail(requestDto.getEmail()).orElseThrow(()->new LoginEmailHasNotEntityException("해당 이메일을 가진 회원은 존재하지 않습니다."));
@@ -92,6 +92,7 @@ public class UserService{
     }
 
     //Refresh 토큰 유효성을 검사하고 새로운 AccessToken  발급
+    @Transactional(readOnly = true)
     public Map loginRefresh(String refreshToken) {
 
         //Redis 를 이용한 유효성 검사
@@ -109,5 +110,18 @@ public class UserService{
         map.put(TokenNameCons.ACCESS.getName(),newAccessToken);
         map.put(TokenNameCons.REFRESH.getName(),refreshToken);
         return map;
+    }
+
+    @Transactional
+    public void changePassword(UserDto.ChangePasswordRequest requestDto) {
+        User user=userRepository.findByEmail(requestDto.getEmail()).orElseThrow(()->new ChangePasswordUserNotFoundException("해당 이메일을 가진 User 는 존재하지 않습니다."));
+        if(!isMatchBeforePassword(user,requestDto.getBeforePassword())){
+            throw new BeforePasswordNotMatchException("입력된 이전 비밀번호는 일치하지 않습니다.");
+        }
+        user.updatePassword(bCryptPasswordEncoder.encode(requestDto.getNewPassword()));//비밀번호 변경
+    }
+
+    public boolean isMatchBeforePassword(User user,String beforePassword){
+        return bCryptPasswordEncoder.matches(beforePassword, user.getPassword());
     }
 }
