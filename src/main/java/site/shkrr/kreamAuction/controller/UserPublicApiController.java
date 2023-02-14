@@ -14,9 +14,9 @@ import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/user")
+@RequestMapping("/user/public")
 @RestController
-public class UserApiController {
+public class UserPublicApiController {
     private final UserService userService;
     private final SmsCertificationService smsCertificationService;
 
