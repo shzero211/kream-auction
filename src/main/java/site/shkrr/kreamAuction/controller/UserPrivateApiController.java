@@ -17,4 +17,10 @@ public class UserPrivateApiController {
         userService.logout(accessToken);
         return Utils.response.of("로그아웃 성공");
     }
+
+    @DeleteMapping("")
+    public ResponseEntity deleteUser(@RequestHeader("access_token")String accessToken){
+        userService.deleteUser(accessToken);
+        return Utils.response.of("회원탈퇴 성공");
+    }
 }
