@@ -8,23 +8,27 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.shkrr.kreamAuction.common.utils.Utils;
 import site.shkrr.kreamAuction.controller.dto.UserDto;
-import site.shkrr.kreamAuction.domain.user.UserRepository;
+import site.shkrr.kreamAuction.domain.redis.CertificationRedisRepository;
 import site.shkrr.kreamAuction.exception.user.EmailNotSignUpException;
+import site.shkrr.kreamAuction.service.user.UserService;
 
 @RequiredArgsConstructor
 @Service
 public class EmailCertificationService {
     private final JavaMailSender mailSender;
-    private final RedisCertificationService redisCertificationService;
+    private final CertificationRedisRepository certificationRedisRepository;
     @Value("${spring.mail.username}")
     private String sendFrom;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
+    /*
+    * 비밀 번호 찾기시 이메일로 인증번호 전송+레디스에 저장
+    * */
     @Transactional
     public void sendCertificationForPassword(String email) {
         String emailStr=String.valueOf(Utils.json.toMap(email).get("email"));
         //회원가입된 이메일인지 확인
-        if(!isExistEmail(emailStr)){
+        if(!userService.isExistEmail(emailStr)){
             throw new EmailNotSignUpException("회원 가입된 이메일이 아닙니다.");
         }
         String certificationNum=Utils.random.makeRandomNum();
@@ -37,12 +41,9 @@ public class EmailCertificationService {
         mailSender.send(message);//이메일 전송
 
         //레디스에 저장
-        redisCertificationService.saveCertificationNumForPassword(emailStr,certificationNum);
+        certificationRedisRepository.save(emailStr,certificationNum);
     }
 
-    private boolean isExistEmail(String email) {
-        return userRepository.existsByEmail(email);
-    }
 
     public String makeMessage(String certificationNum){
         StringBuilder builder = new StringBuilder();
@@ -53,7 +54,10 @@ public class EmailCertificationService {
         return builder.toString();
     }
 
+    /*
+    * 이메일 인증번호 검증후 삭제
+    * */
     public void verifyCertificationNum(UserDto .VerifyCertificationForPasswordRequest requestDto) {
-        redisCertificationService.verifyCertificationNumForPassword(requestDto);
+        certificationRedisRepository.verify(requestDto);
     }
 }

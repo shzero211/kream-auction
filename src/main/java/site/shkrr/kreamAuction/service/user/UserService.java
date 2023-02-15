@@ -1,4 +1,4 @@
-package site.shkrr.kreamAuction.service;
+package site.shkrr.kreamAuction.service.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,9 +12,10 @@ import site.shkrr.kreamAuction.domain.user.User;
 import site.shkrr.kreamAuction.domain.user.UserRepository;
 import site.shkrr.kreamAuction.exception.smsCertification.CertificationNumExpireException;
 import site.shkrr.kreamAuction.exception.user.*;
-import site.shkrr.kreamAuction.service.authorization.JwtAuthRedisService;
-import site.shkrr.kreamAuction.service.certification.RedisCertificationService;
+import site.shkrr.kreamAuction.service.authorization.JwtAuthService;
+import site.shkrr.kreamAuction.domain.redis.CertificationRedisRepository;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,11 +25,11 @@ public class UserService{
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserRepository userRepository;
 
-    private final RedisCertificationService redisCertificationService;
+    private final CertificationRedisRepository certificationRedisRepository;
 
     private final JwtAuthProvider jwtAuthProvider;
 
-    private final JwtAuthRedisService jwtAuthRedisService;
+    private final JwtAuthService jwtAuthService;
 
     @Transactional(readOnly = true)
     public boolean checkEmailDuplicated(String email){
@@ -42,7 +43,7 @@ public class UserService{
 
     @Transactional(readOnly = true)
     private boolean checkCertificationNumIsValid(String phoneNum,String certificationNum) {
-        return redisCertificationService.verifyCertificationNum(phoneNum,certificationNum)==false;
+        return certificationRedisRepository.verify(phoneNum,certificationNum)==false;
     }
 
     @Transactional(readOnly = true)
@@ -65,7 +66,7 @@ public class UserService{
             throw new CertificationNumExpireException("회원 가입에 대한 인증시간이 만료 되었습니다.");
         }
 
-        redisCertificationService.removeCertificationNum(requestDto.getPhoneNum());
+        certificationRedisRepository.removeByKey(requestDto.getPhoneNum());
         //이곳에 휴대폰 인증 번호 검증이 필요요
 
         return userRepository.save(User.builder()
@@ -96,11 +97,11 @@ public class UserService{
     public Map loginRefresh(String refreshToken) {
 
         //Redis 를 이용한 유효성 검사
-        if(!jwtAuthRedisService.isValidRefreshToken(refreshToken)){
+        if(!jwtAuthService.isValidRefreshToken(refreshToken)){
             throw new RefreshTokenIsNotValid("해당 계정의 Refresh Token 은 변경 되었습니다.");
         }
 
-        Long userId= jwtAuthRedisService.getUserId(refreshToken);
+        Long userId= jwtAuthService.getUserId(refreshToken);
         //Token 생성시 DB 와의 정합성을 위한 DB 정보 추출
         User user=userRepository.findById(userId).orElseThrow(()->new LoginRefreshNotFoundUser("login Refresh 과정중 회원 정보를 찾지 못하였습니다."));
 
@@ -123,5 +124,25 @@ public class UserService{
 
     public boolean isMatchBeforePassword(User user,String beforePassword){
         return bCryptPasswordEncoder.matches(beforePassword, user.getPassword());
+    }
+    @Transactional
+    public void logout(String accessToken) {
+        //accessToken 에서 UserId 정보 얻기
+        Long userId=Long.parseLong(jwtAuthProvider.getClaims(accessToken).getSubject());
+
+        //Redis 에 저장 되었있는 refreshToken 제거
+        jwtAuthService.removeRefreshToken(userId);
+
+        //AccessToken 남은 유효기간 얻기
+        Long now=new Date().getTime();
+        Long expiration=jwtAuthProvider.getClaims(accessToken).getExpiration().getTime();
+        Long duration=expiration-now;
+
+        //Redis 에 accessToken 블랙리스트 등록(토큰구조=>토큰값:logout)
+        jwtAuthService.saveBlackListToken(accessToken,duration);
+    }
+
+    public boolean isExistEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 }

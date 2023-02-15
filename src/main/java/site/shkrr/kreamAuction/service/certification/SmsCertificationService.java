@@ -7,6 +7,7 @@ import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import site.shkrr.kreamAuction.common.utils.Utils;
+import site.shkrr.kreamAuction.domain.redis.CertificationRedisRepository;
 import site.shkrr.kreamAuction.exception.smsCertification.CertificationNumNotMatchException;
 
 @Slf4j
@@ -14,14 +15,14 @@ import site.shkrr.kreamAuction.exception.smsCertification.CertificationNumNotMat
 public class SmsCertificationService {
     private static final String fromNum="01039229957";
     private final DefaultMessageService messageService;
-    private final RedisCertificationService redisCertificationService;
+    private final CertificationRedisRepository certificationRedisRepository;
 
     /*
     * 생성자로 sms 서비스를 위한 api_key 가진 객체 서비스 주입
     * */
-    public SmsCertificationService(@Value("${sms.api_key}") String apiKey, @Value("${sms.secret_key}") String secretKey, RedisCertificationService redisCertificationService){
+    public SmsCertificationService(@Value("${sms.api_key}") String apiKey, @Value("${sms.secret_key}") String secretKey, CertificationRedisRepository certificationRedisRepository){
         this.messageService= NurigoApp.INSTANCE.initialize(apiKey,secretKey, "https://api.coolsms.co.kr");
-        this.redisCertificationService = redisCertificationService;
+        this.certificationRedisRepository = certificationRedisRepository;
     }
 
     /*
@@ -48,14 +49,14 @@ public class SmsCertificationService {
         message.setText(certificationMessage);
         //SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));//메세지 발송
         log.info(String.valueOf(certificationNum));// 요금 방지를 위해 info 로 인증 번호 발급
-        redisCertificationService.saveCertificationNum(phoneNum,certificationNum);
+        certificationRedisRepository.save(phoneNum,certificationNum);
     }
 
     /*
-    * 인증 번호 검증
+    * 인증 메세지 번호 검증
     * */
     public void verifyNum(String phoneNum,String certificationNum){
-        if(!(redisCertificationService.hasKey(phoneNum)&&redisCertificationService.verifyCertificationNum(phoneNum,certificationNum))){
+        if(!(certificationRedisRepository.hasKey(phoneNum)&& certificationRedisRepository.verify(phoneNum,certificationNum))){
             throw new CertificationNumNotMatchException("인증번호가 일치하지 않습니다.");
         }
     }
