@@ -7,13 +7,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import site.shkrr.kreamAuction.controller.dto.UserDto;
 import site.shkrr.kreamAuction.domain.user.User;
+import site.shkrr.kreamAuction.service.user.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ActiveProfiles("test")
 class UserServiceTest {
     @Autowired
-    private  UserService userService;
+    private UserService userService;
     @Autowired
     private PasswordEncoder passwordEncoder;
 

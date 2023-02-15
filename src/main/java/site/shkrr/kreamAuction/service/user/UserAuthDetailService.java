@@ -1,4 +1,4 @@
-package site.shkrr.kreamAuction.service;
+package site.shkrr.kreamAuction.service.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -8,11 +8,9 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Duration;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 @ActiveProfiles("test")
-class RedisCertificationServiceTest {
+class CertificationRedisRepositoryTest {
     @Autowired
     private RedisTemplate redisTemplate;
 

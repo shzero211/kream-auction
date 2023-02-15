@@ -6,9 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import site.shkrr.kreamAuction.common.utils.Utils;
 import site.shkrr.kreamAuction.controller.dto.UserDto;
-import site.shkrr.kreamAuction.service.UserService;
 import site.shkrr.kreamAuction.service.certification.EmailCertificationService;
 import site.shkrr.kreamAuction.service.certification.SmsCertificationService;
+import site.shkrr.kreamAuction.service.user.UserService;
 
 import javax.validation.Valid;
 import java.util.Map;
@@ -109,4 +109,5 @@ public class UserPublicApiController {
         userService.changePassword(requestDto);
         return Utils.response.of("비밀번호 변경 성공");
     }
+
 }

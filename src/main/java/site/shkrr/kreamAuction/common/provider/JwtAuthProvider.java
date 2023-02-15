@@ -11,9 +11,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import site.shkrr.kreamAuction.common.constant.TokenNameCons;
 import site.shkrr.kreamAuction.common.constant.TokenValidTimeCons;
-import site.shkrr.kreamAuction.domain.token.refreshToken.RefreshTokenRedisRepository;
+import site.shkrr.kreamAuction.domain.redis.AuthTokenRedisRepository;
 import site.shkrr.kreamAuction.domain.user.Role;
-import site.shkrr.kreamAuction.service.UserAuthDetailService;
+import site.shkrr.kreamAuction.service.user.UserAuthDetailService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -29,7 +29,7 @@ public class JwtAuthProvider {
 
     private final UserAuthDetailService userAuthDetailService;
 
-    private final RefreshTokenRedisRepository refreshTokenRedisRepository;
+    private final AuthTokenRedisRepository authTokenRedisRepository;
 
     //AccessToken 생성
     public String createAccessToken(Long userId, Role role){
@@ -69,7 +69,7 @@ public class JwtAuthProvider {
         Map<String,String> tokenMap=new HashMap<>();
         tokenMap.put(TokenNameCons.ACCESS.getName(),accessToken);
         tokenMap.put(TokenNameCons.REFRESH.getName(),refreshToken);
-        refreshTokenRedisRepository.save(refreshToken,userId,TokenValidTimeCons.REFRESH_VALID_TIME.getTime());
+        authTokenRedisRepository.saveRefreshToken(refreshToken,userId,TokenValidTimeCons.REFRESH_VALID_TIME.getTime());
         return tokenMap;
     }
 
@@ -87,9 +87,19 @@ public class JwtAuthProvider {
         return Jwts.parser().setSigningKey(jwtSecretKey).parseClaimsJws(token).getBody();
     }
 
-    //AccessToken 이 만료 되었는지 확인
+    //token 유효성검사
     public boolean isValid(String token) {
-        return getClaims(token).getExpiration().after(new Date());
+        //유효기간 검사
+        if(!getClaims(token).getExpiration().after(new Date())){
+            return false;
+        }
+
+        //블랙 리스트 검사
+        if(authTokenRedisRepository.isInBlackList(token)){
+            return false;
+        }
+
+        return true;
     }
 
     //AccessToken 정보를 통한 사용자 로그인 객체 생성
