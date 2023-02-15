@@ -128,7 +128,7 @@ public class UserService{
     @Transactional
     public void logout(String accessToken) {
         //accessToken 에서 UserId 정보 얻기
-        Long userId=Long.parseLong(jwtAuthProvider.getClaims(accessToken).getSubject());
+        Long userId=getUserId(accessToken);
 
         //Redis 에 저장 되었있는 refreshToken 제거
         jwtAuthService.removeRefreshToken(userId);
@@ -144,5 +144,21 @@ public class UserService{
 
     public boolean isExistEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    /*
+    * 유저삭제 후 로그아웃
+    * */
+    @Transactional
+    public void deleteUser(String accessToken) {
+        Long userId=getUserId(accessToken);
+        //유저 삭제
+        userRepository.deleteById(userId);
+        //로그아웃
+        logout(accessToken);
+    }
+
+    public Long getUserId(String accessToken){
+       return Long.parseLong(jwtAuthProvider.getClaims(accessToken).getSubject());
     }
 }
