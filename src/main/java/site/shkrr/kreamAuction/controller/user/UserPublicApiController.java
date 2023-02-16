@@ -1,4 +1,4 @@
-package site.shkrr.kreamAuction.controller;
+package site.shkrr.kreamAuction.controller.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -109,5 +109,4 @@ public class UserPublicApiController {
         userService.changePassword(requestDto);
         return Utils.response.of("비밀번호 변경 성공");
     }
-
 }

@@ -1,0 +1,30 @@
+= Kream-Aution API
+개인간 중고거래 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== User API(public)
+
+=== *휴대폰 인증번호 발급*
+
+==== 요청 필드
+include::{snippets}/issuePhoneCertification/request-fields.adoc[]
+
+==== 요청 샘플
+include::{snippets}/issuePhoneCertification/request-body.adoc[]
+
+==== 응답 필드
+include::{snippets}/issuePhoneCertification/response-fields.adoc[]
+
+==== 응답 샘플
+include::{snippets}/issuePhoneCertification/response-body.adoc[]
+
+[horizontal]

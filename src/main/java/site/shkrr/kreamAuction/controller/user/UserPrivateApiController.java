@@ -1,4 +1,4 @@
-package site.shkrr.kreamAuction.controller;
+package site.shkrr.kreamAuction.controller.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
