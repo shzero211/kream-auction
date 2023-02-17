@@ -40,7 +40,7 @@ public class SmsCertificationService {
     /*
     * 인증 메세지 전송
     * */
-    public void sendTo(String phoneNum){
+    public String sendTo(String phoneNum){
         Message message =new Message();
         String certificationNum=Utils.random.makeRandomNum();
         String certificationMessage=makeMessage(certificationNum);
@@ -50,6 +50,7 @@ public class SmsCertificationService {
         //SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));//메세지 발송
         log.info(String.valueOf(certificationNum));// 요금 방지를 위해 info 로 인증 번호 발급
         certificationRedisRepository.save(phoneNum,certificationNum);
+        return certificationNum;
     }
 
     /*
