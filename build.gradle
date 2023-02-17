@@ -1,26 +1,42 @@
 plugins {
 	id 'org.springframework.boot' version '2.4.1'
 	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
-	id 'org.asciidoctor.convert' version "1.5.9.2"
 	id 'java'
+	id "org.asciidoctor.jvm.convert" version "3.3.2"//Asciidoctor 플러그인
 }
 
 group = 'site.shkrr'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+configurations {//라이브러리 설정에 등록
+	asciidoctorExtensions
+}
+
+ext {//스니펫 디렉토리 경로 저장
+	snippetsDir = file('build/generated-snippets')
 }
 
 repositories {
 	mavenCentral()
 }
+test {
+	useJUnitPlatform()
+	outputs.dir snippetsDir//테스트후 생성된 스니펫을 스니펫 저장소에 전송
+}
 
-ext {
-	set('snippetsDir', file("build/generated-snippets"))
+asciidoctor {
+	dependsOn test//테스트 먼저 작동 되도록
+	configurations 'asciidoctorExtensions'//설정 등록
+	inputs.dir snippetsDir//설정 경로
+}
+
+bootJar {
+	dependsOn asciidoctor
+	copy {//생성된 html 복사
+		from "build/docs/asciidoc"
+		into 'src/main/resources/static/docs'
+	}
 }
 
 dependencies {
@@ -39,15 +55,5 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-
-}
-
-tasks.named('test') {
-	outputs.dir snippetsDir
-	useJUnitPlatform()
-}
-
-tasks.named('asciidoctor') {
-	inputs.dir snippetsDir
-	dependsOn test
+	asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 }
