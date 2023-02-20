@@ -10,8 +10,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${email}
-    password: ${password}
+    username: ${mail_email}
+    password: ${mail_password}
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
@@ -23,3 +23,19 @@ sms:
 
 jwt:
   secret_key: ${jwt_secret_key}
+
+cloud:
+  aws:
+    s3:
+      bucket: recipia
+    credentials:
+      access-key: ${s3_access_key}
+      secret-key: ${s3_secret_key}
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+admin:
+  email: ${admin_email}
+  password: ${admin_password}

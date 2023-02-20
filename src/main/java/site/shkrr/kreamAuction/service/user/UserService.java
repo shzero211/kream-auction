@@ -161,4 +161,24 @@ public class UserService{
     public Long getUserId(String accessToken){
        return Long.parseLong(jwtAuthProvider.getClaims(accessToken).getSubject());
     }
+    /*
+    * Runner 에서 사용될 Admin 유저 생성 메서드
+    * */
+    public User signUpForAdmin(UserDto.UserSignUpRequestDto requestDto) {
+        if(checkEmailDuplicated(requestDto.getEmail())){
+            throw new DuplicateEmailException("이미 가입된 이메일 이 존재합니다.");
+        }
+
+        if(checkPhoneNumDuplicated(requestDto.getPhoneNum())){
+            throw new DuplicatePhoneNumException("이미 가입된 휴대폰 번호 입니다.");
+        }
+
+        return userRepository.save(User.builder()
+                .email(requestDto.getEmail())
+                .password(bCryptPasswordEncoder.encode(requestDto.getPassword()))
+                .phoneNum(requestDto.getPhoneNum())
+                .role(Role.ROLE_ADMIN)
+                .build());
+    }
+
 }
