@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import site.shkrr.kreamAuction.exception.brand.UpLoadBrandImgFailException;
+import site.shkrr.kreamAuction.service.storage.common.ImageType;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -21,9 +22,9 @@ public class AwsS3Service {
 
     private final AmazonS3 amazonS3;
 
-    public String uploadBrandImg(MultipartFile file){
+    public String uploadImg(MultipartFile file, ImageType imageType){
         String fileOriName=file.getOriginalFilename();
-        String uploadName=makeUploadName(fileOriName);
+        String uploadName=makeUploadName(fileOriName, imageType.getDirPath());
 
         ObjectMetadata metadata=new ObjectMetadata();
         metadata.setContentType(file.getContentType());
@@ -36,11 +37,11 @@ public class AwsS3Service {
         return amazonS3.getUrl(bucket,uploadName).toString();
     }
 
-    public String makeUploadName(String fileOriName){
+    public String makeUploadName(String fileOriName,String dirPath){
         StringBuilder sb=new StringBuilder();
         UUID uuid=UUID.randomUUID();
         String extension=getExtension(fileOriName);
-        sb.append(uuid).append(".").append(extension);
+        sb.append(dirPath).append("/").append(uuid).append(".").append(extension);
         return sb.toString();
     }
 

@@ -10,6 +10,12 @@ import site.shkrr.kreamAuction.domain.brand.Brand;
 import site.shkrr.kreamAuction.domain.brand.BrandRepository;
 import site.shkrr.kreamAuction.exception.brand.DuplicateBrandNameException;
 import site.shkrr.kreamAuction.service.storage.AwsS3Service;
+import site.shkrr.kreamAuction.service.storage.common.ImageType;
+
+import java.util.Optional;
+
+import static site.shkrr.kreamAuction.controller.dto.BrandDto.BrandInfo;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -18,7 +24,7 @@ public class BrandService {
     private final BrandRepository brandRepository;
     private final AwsS3Service awsS3Service;
     @Transactional
-    public void createBrand(CreateRequest requestDto, MultipartFile multipartFile){
+    public Brand createBrand(CreateRequest requestDto, MultipartFile multipartFile){
 
         Brand brand=Brand.builder()
                 .nameKor(requestDto.getNameKor())
@@ -30,11 +36,11 @@ public class BrandService {
         }
 
         if(multipartFile!=null){//이미지 파일이 있을시
-            String brandImgPath=awsS3Service.uploadBrandImg(multipartFile);
+            String brandImgPath=awsS3Service.uploadImg(multipartFile, ImageType.BRAND);
             brand.updateBrandImgPath(brandImgPath);
         }
 
-        brandRepository.save(brand);
+        return brandRepository.save(brand);
     }
 
     private boolean isDuplicatedName(CreateRequest requestDto) {
@@ -47,4 +53,11 @@ public class BrandService {
         return false;
     }
 
+    public boolean isBrandExist(BrandInfo brandInfo) {
+        Optional<Brand> brand=brandRepository.findById(brandInfo.getId());
+        if(brand.isEmpty()||!brand.get().getNameKor().equals(brandInfo.getNameKor())){
+            return false;
+        }
+        return true;
+    }
 }

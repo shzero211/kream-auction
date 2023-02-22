@@ -1,17 +1,23 @@
 package site.shkrr.kreamAuction.domain.brand;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import site.shkrr.kreamAuction.domain.BaseTimeEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-@SuperBuilder
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Brand extends BaseTimeEntity {
+    @Id
+    @GeneratedValue
+    private Long id;
+
     @Column(unique = true)
     private String nameKor;
 

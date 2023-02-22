@@ -1,20 +1,21 @@
 package site.shkrr.kreamAuction.domain.product;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import site.shkrr.kreamAuction.domain.BaseTimeEntity;
 import site.shkrr.kreamAuction.domain.brand.Brand;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+import java.time.LocalDate;
 
 @Getter
-@SuperBuilder
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Product extends BaseTimeEntity {
+    @Id
+    @GeneratedValue
+    private Long id;
 
     private String nameKor;
 
@@ -22,12 +23,13 @@ public class Product extends BaseTimeEntity {
 
     private String modelNum;
 
-    private String releaseDate;
+    private LocalDate releaseDate;
 
     private String color;
 
-    private String releasePrice;
+    private int releasePrice;
 
+    @Enumerated(EnumType.STRING)
     private ReleasePriceType releasePriceType;
 
     private Double minSize;
@@ -39,7 +41,7 @@ public class Product extends BaseTimeEntity {
     private String imagePath;
 
     @ManyToOne(optional = false)//조회시 Inner join 강제
-    @JoinColumn(name = "brand_id")
+    @JoinColumn(name = "BRAND_ID")
     private Brand brand;
 
 }
