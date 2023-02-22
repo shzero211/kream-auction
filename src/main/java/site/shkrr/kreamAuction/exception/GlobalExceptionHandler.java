@@ -8,9 +8,12 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import site.shkrr.kreamAuction.common.utils.Utils;
+import site.shkrr.kreamAuction.exception.brand.BrandNotFoundException;
+import site.shkrr.kreamAuction.exception.brand.DuplicateBrandNameException;
+import site.shkrr.kreamAuction.exception.brand.UpLoadBrandImgFailException;
+import site.shkrr.kreamAuction.exception.smsCertification.CertificationKeyIsNullException;
 import site.shkrr.kreamAuction.exception.smsCertification.CertificationNumExpireException;
 import site.shkrr.kreamAuction.exception.smsCertification.CertificationNumNotMatchException;
-import site.shkrr.kreamAuction.exception.smsCertification.CertificationKeyIsNullException;
 import site.shkrr.kreamAuction.exception.user.*;
 
 import java.util.HashMap;
@@ -117,4 +120,21 @@ public class GlobalExceptionHandler{
         return Utils.response.ofException(ex.getMessage());
     }
 
+    @ExceptionHandler(DuplicateBrandNameException.class)
+    public ResponseEntity handleDuplicateBrandNameException(DuplicateBrandNameException ex){
+        log.debug(String.valueOf(ex));
+        return Utils.response.ofException(ex.getMessage());
+    }
+
+    @ExceptionHandler(UpLoadBrandImgFailException.class)
+    public ResponseEntity handleUpLoadBrandImgFailException(UpLoadBrandImgFailException ex){
+        log.debug(String.valueOf(ex));
+        return Utils.response.ofException(ex.getMessage());
+    }
+
+    @ExceptionHandler(BrandNotFoundException.class)
+    public ResponseEntity handleBrandNotFoundException(BrandNotFoundException ex){
+        log.debug(String.valueOf(ex));
+        return Utils.response.ofException(ex.getMessage());
+    }
 }

@@ -12,6 +12,7 @@ import org.springframework.security.web.header.writers.frameoptions.WhiteListedA
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import site.shkrr.kreamAuction.common.filter.JwtAuthenticationExceptionHandlerFilter;
 import site.shkrr.kreamAuction.common.filter.JwtAuthenticationFilter;
+import site.shkrr.kreamAuction.domain.user.Role;
 
 import java.util.Arrays;
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class SecurityConfig{
                 .authorizeRequests(x->
                                  x.antMatchers("/user/public/**").anonymous()
                                          .antMatchers("/h2-console/**","/docs/**").permitAll()
+                                         .antMatchers("/brand/**").hasAuthority(Role.ROLE_ADMIN.toString())
                                 .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationExceptionHandlerFilter,JwtAuthenticationFilter.class)

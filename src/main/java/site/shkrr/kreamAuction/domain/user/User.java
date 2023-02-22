@@ -1,27 +1,27 @@
 package site.shkrr.kreamAuction.domain.user;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import site.shkrr.kreamAuction.domain.BaseTimeEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 @Getter
-@SuperBuilder
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access=AccessLevel.PROTECTED)
 @Table(name = "Users")
 @Entity
 public class User extends BaseTimeEntity implements UserDetails {
+    @Id
+    @GeneratedValue
+    private Long id;
+
     @Column(unique = true)
     private String email;
 
