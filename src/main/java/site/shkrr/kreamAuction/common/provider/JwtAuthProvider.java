@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import site.shkrr.kreamAuction.common.constant.TokenNameCons;
 import site.shkrr.kreamAuction.common.constant.TokenValidTimeCons;
 import site.shkrr.kreamAuction.domain.redis.AuthTokenRedisRepository;
-import site.shkrr.kreamAuction.domain.user.Role;
+import site.shkrr.kreamAuction.domain.user.common.Role;
 import site.shkrr.kreamAuction.service.user.UserAuthDetailService;
 
 import javax.servlet.http.HttpServletRequest;

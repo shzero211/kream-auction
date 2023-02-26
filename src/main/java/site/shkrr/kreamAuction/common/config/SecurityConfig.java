@@ -12,7 +12,7 @@ import org.springframework.security.web.header.writers.frameoptions.WhiteListedA
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import site.shkrr.kreamAuction.common.filter.JwtAuthenticationExceptionHandlerFilter;
 import site.shkrr.kreamAuction.common.filter.JwtAuthenticationFilter;
-import site.shkrr.kreamAuction.domain.user.Role;
+import site.shkrr.kreamAuction.domain.user.common.Role;
 
 import java.util.Arrays;
 @RequiredArgsConstructor

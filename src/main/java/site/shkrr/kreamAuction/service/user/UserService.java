@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import site.shkrr.kreamAuction.common.constant.TokenNameCons;
 import site.shkrr.kreamAuction.common.provider.JwtAuthProvider;
 import site.shkrr.kreamAuction.controller.dto.UserDto;
-import site.shkrr.kreamAuction.domain.user.Role;
+import site.shkrr.kreamAuction.domain.user.common.Role;
 import site.shkrr.kreamAuction.domain.user.User;
 import site.shkrr.kreamAuction.domain.user.UserRepository;
 import site.shkrr.kreamAuction.exception.smsCertification.CertificationNumExpireException;

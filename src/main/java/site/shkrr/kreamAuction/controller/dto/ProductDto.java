@@ -4,7 +4,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import site.shkrr.kreamAuction.controller.dto.BrandDto.BrandInfo;
 import site.shkrr.kreamAuction.domain.product.Product;
-import site.shkrr.kreamAuction.domain.product.ReleasePriceType;
+import site.shkrr.kreamAuction.domain.product.common.ReleasePriceType;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -35,7 +35,7 @@ public class ProductDto {
 
         @Positive(message = "올바른 출시가를 입력해주세요.")//양수
         @NotNull(message = "출시가를 입력해주세요.")
-        private int releasePrice;
+        private Long releasePrice;
 
         @NotNull(message = "출시가 통화를 선택해주세요.")
         private ReleasePriceType releasePriceType;

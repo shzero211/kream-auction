@@ -1,4 +1,4 @@
-package site.shkrr.kreamAuction.domain.user;
+package site.shkrr.kreamAuction.domain.user.common;
 
 import lombok.Getter;
 
