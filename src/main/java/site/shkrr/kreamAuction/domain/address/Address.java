@@ -16,7 +16,7 @@ public class Address extends BaseTimeEntity {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY,optional = false)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -30,4 +30,7 @@ public class Address extends BaseTimeEntity {
 
     private String detailAddress;
 
+    public void updateUser(User user) {
+        this.user=user;
+    }
 }
