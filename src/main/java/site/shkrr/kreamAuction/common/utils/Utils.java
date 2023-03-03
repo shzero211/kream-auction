@@ -10,7 +10,6 @@ import site.shkrr.kreamAuction.exception.user.JsonToMapException;
 import site.shkrr.kreamAuction.exception.user.MapToJsonException;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -71,18 +70,19 @@ public class Utils {
     }
 
     public static class json{
-        public static String toJson(Map<String,Object> map){
+        public static String toJson(Object obj){
             try {
-                return getObjectMapper().writeValueAsString(map);
+                return getObjectMapper().writeValueAsString(obj);
             } catch (JsonProcessingException e) {
-                throw new MapToJsonException("Map 을 Json 으로 변경 실패");
+                throw new MapToJsonException("객체를 Json 으로 변경 실패");
             }
         }
-        public static Map<String,Object> toMap(String jsonStr){
+
+        public static <T> T toObj(String jsonStr,Class<T> classType){
             try {
-                return getObjectMapper().readValue(jsonStr, LinkedHashMap.class);
+                return getObjectMapper().readValue(jsonStr,classType);
             } catch (JsonProcessingException e) {
-                throw new JsonToMapException("Json 을 Map 으로 변경 실패");
+                throw new JsonToMapException(e.toString());
             }
         }
     }
