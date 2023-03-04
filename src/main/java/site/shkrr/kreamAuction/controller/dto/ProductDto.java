@@ -77,4 +77,15 @@ public class ProductDto {
             this.imagePath=imagePath;
         }
     }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class ProductInfo{
+        private Long id;
+        private Long price;
+        private String nameKor;
+        private String nameEng;
+        private String color;
+    }
 }

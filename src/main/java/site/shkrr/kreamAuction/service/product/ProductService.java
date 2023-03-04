@@ -6,11 +6,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import site.shkrr.kreamAuction.controller.dto.BrandDto.BrandInfo;
 import site.shkrr.kreamAuction.controller.dto.ProductDto.CreateRequest;
+import site.shkrr.kreamAuction.domain.product.Product;
 import site.shkrr.kreamAuction.domain.product.ProductRepository;
 import site.shkrr.kreamAuction.exception.brand.BrandNotFoundException;
 import site.shkrr.kreamAuction.service.brand.BrandService;
 import site.shkrr.kreamAuction.service.storage.AwsS3Service;
 import site.shkrr.kreamAuction.service.storage.common.ImageType;
+
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -32,7 +35,9 @@ public class ProductService {
 
         productRepository.save(requestDto.toEntity());
     }
-
+    public Optional<Product> findById(Long id){
+        return productRepository.findById(id);
+    }
 
     private boolean isBrandExist(BrandInfo brand) {
         return brandService.isBrandExist(brand);

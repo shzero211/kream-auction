@@ -37,6 +37,10 @@ public class Utils {
         public static ResponseEntity ofException(Object msg){
             return new ResponseEntity(map.of("error_msg",msg), HttpStatus.BAD_REQUEST);
         }
+
+        public static ResponseEntity ofExceptionForAPI(Object msg){
+            return new ResponseEntity(msg, HttpStatus.BAD_REQUEST);
+        }
     }
 
     /*

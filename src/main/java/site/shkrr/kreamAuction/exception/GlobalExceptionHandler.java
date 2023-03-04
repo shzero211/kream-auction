@@ -11,6 +11,8 @@ import site.shkrr.kreamAuction.common.utils.Utils;
 import site.shkrr.kreamAuction.exception.brand.BrandNotFoundException;
 import site.shkrr.kreamAuction.exception.brand.DuplicateBrandNameException;
 import site.shkrr.kreamAuction.exception.brand.UpLoadBrandImgFailException;
+import site.shkrr.kreamAuction.exception.payment.PaymentException;
+import site.shkrr.kreamAuction.exception.payment.RequestBillingKeyException;
 import site.shkrr.kreamAuction.exception.smsCertification.CertificationKeyIsNullException;
 import site.shkrr.kreamAuction.exception.smsCertification.CertificationNumExpireException;
 import site.shkrr.kreamAuction.exception.smsCertification.CertificationNumNotMatchException;
@@ -136,5 +138,17 @@ public class GlobalExceptionHandler{
     public ResponseEntity handleBrandNotFoundException(BrandNotFoundException ex){
         log.debug(String.valueOf(ex));
         return Utils.response.ofException(ex.getMessage());
+    }
+
+    @ExceptionHandler(RequestBillingKeyException.class)
+    public ResponseEntity handleBrandNotFoundException(RequestBillingKeyException ex){
+        log.debug(String.valueOf(ex));
+        return Utils.response.ofException(ex.getMessage());
+    }
+
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity handlePaymentException(PaymentException ex){
+        log.debug(String.valueOf(ex));
+        return Utils.response.ofExceptionForAPI(ex.getErrorResponse());
     }
 }
