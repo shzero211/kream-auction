@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import site.shkrr.kreamAuction.domain.payment.Payment;
 import site.shkrr.kreamAuction.domain.payment.enums.Status;
+import site.shkrr.kreamAuction.domain.paymentrecord.PaymentRecord;
 import site.shkrr.kreamAuction.domain.user.User;
 
 import java.util.Date;
@@ -86,5 +87,14 @@ public class PaymentDto {
         private String orderId; //주문 아이디
         private String orderName; //주문명
         private String totalAmount; //결제금액
+        public PaymentRecord toPaymentRecord(Payment payment){
+            return PaymentRecord.builder()
+                    .payment(payment)
+                    .paymentKey(paymentKey)
+                    .orderId(orderId)
+                    .orderName(orderName)
+                    .totalAmount(totalAmount)
+                    .build();
+        }
     }
 }

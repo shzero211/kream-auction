@@ -17,6 +17,7 @@ import site.shkrr.kreamAuction.exception.payment.PaymentException;
 import site.shkrr.kreamAuction.exception.payment.RequestBillingKeyException;
 import site.shkrr.kreamAuction.service.encrypt.EncryptService;
 import site.shkrr.kreamAuction.service.payment.enums.BankNames;
+import site.shkrr.kreamAuction.service.paymentrecord.PaymentRecordService;
 import site.shkrr.kreamAuction.service.product.ProductService;
 
 import java.net.URI;
@@ -34,9 +35,10 @@ public class PaymentService {
 
     @Value("${payment.authorization}")
     private String tossHttpAuthorization;
-    private final PaymentRepository paymentRepository;
     private final EncryptService encryptService;
     private final ProductService productService;
+    private final PaymentRecordService paymentRecordService;
+    private final PaymentRepository paymentRepository;
     /*
     * 대표 결제 수단 등록
     * */
@@ -106,6 +108,8 @@ public class PaymentService {
             throw new PaymentException(response.body(),"결제 실패 에러 발생");
         }
 
+        //결제 내역 저장
+        paymentRecordService.save(responseBody,payment);
     }
 
 
