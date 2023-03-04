@@ -67,6 +67,19 @@ public class Utils {
             Random random=new Random();
             return String.valueOf(100000 + random.nextInt(900000));
         }
+
+        public static String makeRandomKey(){
+            int leftLimit=48;//'0'
+            int rightLimit=122;
+            int keyLength=10;
+            Random random=new Random();
+            String randomKey=random.ints(leftLimit,rightLimit + 1)
+                    .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+                    .limit(keyLength)
+                    .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                    .toString();
+            return randomKey;
+        }
     }
 
     public static class json{

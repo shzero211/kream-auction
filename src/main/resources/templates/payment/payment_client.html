@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>결제하기</title>
+    <script src="https://js.tosspayments.com/v1/payment"></script>
+  </head>
+  <body>
+    <script th:inline="javascript">
+      
+      var clientKey =[[${clientKey}]]
+      var customerKey=[[${customerKey}]]
+      var tossPayments = TossPayments(clientKey) // 클라이언트 키로 초기화하기
+      tossPayments.requestBillingAuth('카드', { // 결제 수단 파라미터
+      // 빌링키 발급 요청을 위한 파라미터
+      customerKey: customerKey,
+      successUrl: 'http://localhost:8080/payment',
+      failUrl: 'http://localhost:8080/payment/fail',
+      })
+      .catch(function (error) {
+        if (error.code === 'USER_CANCEL') {
+          // 결제 고객이 결제창을 닫았을 때 에러 처리
+        } else if (error.code === 'INVALID_CARD_COMPANY') {
+          // 유효하지 않은 카드 코드에 대한 에러 처리
+        }
+      })
+    </script>
+  </body>
+</html>

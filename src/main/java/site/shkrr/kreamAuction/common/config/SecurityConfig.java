@@ -27,8 +27,8 @@ public class SecurityConfig{
                 .httpBasic().disable()
                 .authorizeRequests(x->
                                  x.antMatchers("/user/public/**").anonymous()
-                                         .antMatchers("/h2-console/**","/docs/**").permitAll()
-                                         .antMatchers("/brand/**").hasAuthority(Role.ROLE_ADMIN.toString())
+                                         .antMatchers("/h2-console/**","/docs/**","/payment/client").permitAll()
+                                         .antMatchers("/brand/**","/product/**").hasAuthority(Role.ROLE_ADMIN.toString())
                                 .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationExceptionHandlerFilter,JwtAuthenticationFilter.class)
