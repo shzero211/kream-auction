@@ -12,6 +12,8 @@ import site.shkrr.kreamAuction.domain.redis.CertificationRedisRepository;
 import site.shkrr.kreamAuction.exception.user.EmailNotSignUpException;
 import site.shkrr.kreamAuction.service.user.UserService;
 
+import java.util.Map;
+
 @RequiredArgsConstructor
 @Service
 public class EmailCertificationService {
@@ -26,7 +28,7 @@ public class EmailCertificationService {
     * */
     @Transactional
     public void sendCertificationForPassword(String email) {
-        String emailStr=String.valueOf(Utils.json.toMap(email).get("email"));
+        String emailStr=String.valueOf(Utils.json.toObj(email,Map.class).get("email"));
         //회원가입된 이메일인지 확인
         if(!userService.isExistEmail(emailStr)){
             throw new EmailNotSignUpException("회원 가입된 이메일이 아닙니다.");
