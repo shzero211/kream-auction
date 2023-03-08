@@ -3,6 +3,7 @@ package site.shkrr.kreamAuction.domain.paymentrecord;
 import lombok.*;
 import site.shkrr.kreamAuction.domain.BaseTimeEntity;
 import site.shkrr.kreamAuction.domain.payment.Payment;
+import site.shkrr.kreamAuction.domain.paymentrecord.enums.Status;
 
 import javax.persistence.*;
 
@@ -28,4 +29,9 @@ public class PaymentRecord extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY,optional = false)
     private Payment payment;
 
+    private Status status;
+
+    public void cancel() {
+        this.status=Status.CANCELLED;
+    }
 }

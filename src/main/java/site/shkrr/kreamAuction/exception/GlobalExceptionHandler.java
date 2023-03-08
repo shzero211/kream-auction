@@ -14,7 +14,6 @@ import site.shkrr.kreamAuction.exception.brand.UpLoadBrandImgFailException;
 import site.shkrr.kreamAuction.exception.payment.PaymentException;
 import site.shkrr.kreamAuction.exception.payment.RequestBillingKeyException;
 import site.shkrr.kreamAuction.exception.smsCertification.CertificationKeyIsNullException;
-import site.shkrr.kreamAuction.exception.smsCertification.CertificationNumExpireException;
 import site.shkrr.kreamAuction.exception.smsCertification.CertificationNumNotMatchException;
 import site.shkrr.kreamAuction.exception.user.*;
 
@@ -64,12 +63,6 @@ public class GlobalExceptionHandler{
 
     @ExceptionHandler(CertificationNumNotMatchException.class)
     public ResponseEntity handleSmsCertificationNumException(CertificationNumNotMatchException ex){
-        log.debug(String.valueOf(ex));
-        return Utils.response.ofException(ex.getMessage());
-    }
-
-    @ExceptionHandler(CertificationNumExpireException.class)
-    public ResponseEntity handleCertificationNumExpireException(CertificationNumExpireException ex){
         log.debug(String.valueOf(ex));
         return Utils.response.ofException(ex.getMessage());
     }

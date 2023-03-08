@@ -9,14 +9,34 @@ import site.shkrr.kreamAuction.domain.user.User;
 
 import java.util.Date;
 
+import static site.shkrr.kreamAuction.domain.paymentrecord.enums.Status.*;
+
 public class PaymentDto {
 
     @Getter
+    @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
     public static class BillingRequest {
         private String customerKey;
         private String authKey;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static  class BillingRequestCardInfo{
+        private String customerKey;
+        private String cardNumber;
+        private String cardExpirationYear;
+        private String cardExpirationMonth;
+        private String cardPassword;
+        private String customerIdentityNumber;
+
+        public void addCustomerKey(String customerKey) {
+            this.customerKey=customerKey;
+        }
     }
 
     @Getter
@@ -87,14 +107,42 @@ public class PaymentDto {
         private String orderId; //주문 아이디
         private String orderName; //주문명
         private String totalAmount; //결제금액
-        public PaymentRecord toPaymentRecord(Payment payment){
+        public PaymentRecord toPaymentRecord(Payment payment,String encryptPaymentKey){
             return PaymentRecord.builder()
                     .payment(payment)
-                    .paymentKey(paymentKey)
+                    .paymentKey(encryptPaymentKey)
                     .orderId(orderId)
                     .orderName(orderName)
                     .totalAmount(totalAmount)
+                    .status(PAID)
                     .build();
         }
+    }
+
+    @Getter
+    @Builder
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class PaymentCancelRequest{
+
+        private Long id;
+
+        private String paymentKey;
+
+        private String cancelReason;
+
+        public void updatePaymentKey(String decryptPaymentKey) {
+            this.paymentKey=decryptPaymentKey;
+        }
+    }
+
+    @Getter
+    @Builder
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class PaymentCancelResponse{
+        private String paymentKey;
     }
 }

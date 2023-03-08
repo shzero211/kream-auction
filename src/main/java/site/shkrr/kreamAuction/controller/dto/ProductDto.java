@@ -79,6 +79,7 @@ public class ProductDto {
     }
 
     @Getter
+    @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
     public static class ProductInfo{
@@ -87,5 +88,11 @@ public class ProductDto {
         private String nameKor;
         private String nameEng;
         private String color;
+        public ProductInfo(Long id,Long price,String nameKor,String nameEng){
+            this.id=id;
+            this.price=price;
+            this.nameKor=nameKor;
+            this.nameEng=nameEng;
+        }
     }
 }

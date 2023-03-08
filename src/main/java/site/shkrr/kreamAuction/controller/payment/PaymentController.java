@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import site.shkrr.kreamAuction.common.utils.Utils;
+import site.shkrr.kreamAuction.controller.dto.PaymentDto;
 import site.shkrr.kreamAuction.controller.dto.PaymentDto.BillingRequest;
 import site.shkrr.kreamAuction.controller.dto.ProductDto.ProductInfo;
 import site.shkrr.kreamAuction.domain.user.User;
@@ -39,9 +40,15 @@ public class PaymentController {
 
     @PostMapping("")
     @ResponseBody
-    public ResponseEntity pay(@AuthenticationPrincipal User loginUser, @RequestBody ProductInfo productInfo){
-        paymentService.pay(loginUser,productInfo);
+    public ResponseEntity payForPayment(@AuthenticationPrincipal User loginUser, @RequestBody ProductInfo requestDto){
+        paymentService.pay(loginUser,requestDto);
         return Utils.response.of("결제 성공");
     }
 
+    @PostMapping("/cancel")
+    @ResponseBody
+    public ResponseEntity cancelPayment(@AuthenticationPrincipal User loginUser, @RequestBody PaymentDto.PaymentCancelRequest requestDto){
+        paymentService.cancel(loginUser,requestDto);
+        return Utils.response.of("결제 취소 성공");
+    }
 }

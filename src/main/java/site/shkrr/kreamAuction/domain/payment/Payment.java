@@ -34,7 +34,7 @@ public class Payment extends BaseTimeEntity {
     private String bankName;
 
     private String bankAccount;
-    public PayForPaymentRequest toPayForPaymentRequest(ProductInfo productInfo) {
+    public PayForPaymentRequest toPayForPaymentRequest(ProductInfo productInfo,String decryptCustomerKey) {
 
         StringBuilder orderNameBuilder=new StringBuilder();
 
@@ -43,7 +43,7 @@ public class Payment extends BaseTimeEntity {
         String newOrderId=Utils.random.makeRandomKey();
 
         return PayForPaymentRequest.builder()
-                .customerKey(customerKey)
+                .customerKey(decryptCustomerKey)
                 .amount(productInfo.getPrice())
                 .orderId(newOrderId)
                 .orderName(orderNameBuilder.toString())

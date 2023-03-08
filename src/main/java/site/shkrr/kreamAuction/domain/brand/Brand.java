@@ -1,6 +1,7 @@
 package site.shkrr.kreamAuction.domain.brand;
 
 import lombok.*;
+import site.shkrr.kreamAuction.controller.dto.BrandDto.BrandInfo;
 import site.shkrr.kreamAuction.domain.BaseTimeEntity;
 
 import javax.persistence.Column;
@@ -28,5 +29,12 @@ public class Brand extends BaseTimeEntity {
 
     public void updateBrandImgPath(String imagePath) {
         this.imagePath=imagePath;
+    }
+    public BrandInfo toBrandInfo(){
+        return BrandInfo.builder()
+                .id(id)
+                .nameKor(nameKor)
+                .nameEng(nameEng)
+                .build();
     }
 }

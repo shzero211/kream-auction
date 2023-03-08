@@ -20,3 +20,10 @@ spring:
 logging:
   level:
     site.shkrr: debug
+
+test:
+  card_num: ${test_card_num}
+  card_year: ${test_card_year}
+  card_month: ${test_card_month}
+  card_customer_id: ${test_card_customer_id}
+  card_password: ${test_card_password}
