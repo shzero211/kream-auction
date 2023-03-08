@@ -10,7 +10,6 @@ import site.shkrr.kreamAuction.exception.user.JsonToMapException;
 import site.shkrr.kreamAuction.exception.user.MapToJsonException;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -37,6 +36,10 @@ public class Utils {
 
         public static ResponseEntity ofException(Object msg){
             return new ResponseEntity(map.of("error_msg",msg), HttpStatus.BAD_REQUEST);
+        }
+
+        public static ResponseEntity ofExceptionForAPI(Object msg){
+            return new ResponseEntity(msg, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -68,21 +71,35 @@ public class Utils {
             Random random=new Random();
             return String.valueOf(100000 + random.nextInt(900000));
         }
+
+        public static String makeRandomKey(){
+            int leftLimit=48;//'0'
+            int rightLimit=122;
+            int keyLength=10;
+            Random random=new Random();
+            String randomKey=random.ints(leftLimit,rightLimit + 1)
+                    .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+                    .limit(keyLength)
+                    .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                    .toString();
+            return randomKey;
+        }
     }
 
     public static class json{
-        public static String toJson(Map<String,Object> map){
+        public static String toJson(Object obj){
             try {
-                return getObjectMapper().writeValueAsString(map);
+                return getObjectMapper().writeValueAsString(obj);
             } catch (JsonProcessingException e) {
-                throw new MapToJsonException("Map 을 Json 으로 변경 실패");
+                throw new MapToJsonException("객체를 Json 으로 변경 실패");
             }
         }
-        public static Map<String,Object> toMap(String jsonStr){
+
+        public static <T> T toObj(String jsonStr,Class<T> classType){
             try {
-                return getObjectMapper().readValue(jsonStr, LinkedHashMap.class);
+                return getObjectMapper().readValue(jsonStr,classType);
             } catch (JsonProcessingException e) {
-                throw new JsonToMapException("Json 을 Map 으로 변경 실패");
+                throw new JsonToMapException(e.toString());
             }
         }
     }

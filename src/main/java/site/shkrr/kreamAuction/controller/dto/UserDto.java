@@ -27,8 +27,6 @@ public class UserDto {
         @Pattern(regexp = "(01[016789])(\\d{3,4})(\\d{4})", message = "올바른 휴대폰 번호를 입력해주세요.")
         private String phoneNum;
 
-        @NotBlank(message = "인증번호가 비어있습니다.")
-        private String certificationNum;
 
     }
     @Getter

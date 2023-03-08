@@ -28,7 +28,7 @@ public class UserPublicApiController {
     * */
     @PostMapping("/sms")
     public ResponseEntity sendSms(@RequestBody String phoneNum){
-        String phoneNumToStr=String.valueOf(Utils.json.toMap(phoneNum).get("phoneNum"));
+        String phoneNumToStr=String.valueOf(Utils.json.toObj(phoneNum,String.class));
         smsCertificationService.sendTo(phoneNumToStr);
         return Utils.response.of("메세지 전송 성공!");
     }

@@ -5,11 +5,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import site.shkrr.kreamAuction.domain.BaseTimeEntity;
+import site.shkrr.kreamAuction.domain.address.Address;
+import site.shkrr.kreamAuction.domain.user.common.Role;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Getter
 @Builder
@@ -30,8 +30,11 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Column(unique = true)
     private String phoneNum;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    private Set<Address> addresses=new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

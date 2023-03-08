@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import site.shkrr.kreamAuction.controller.dto.UserDto;
 import site.shkrr.kreamAuction.service.certification.SmsCertificationService;
@@ -15,6 +16,7 @@ import static site.shkrr.kreamAuction.controller.dto.UserDto.UserSignUpRequestDt
 
 @Slf4j
 @RequiredArgsConstructor
+@Profile("local")
 @Component
 public class LocalRunner implements CommandLineRunner {
 
