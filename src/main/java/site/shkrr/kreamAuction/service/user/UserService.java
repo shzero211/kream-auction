@@ -7,13 +7,12 @@ import org.springframework.transaction.annotation.Transactional;
 import site.shkrr.kreamAuction.common.constant.TokenNameCons;
 import site.shkrr.kreamAuction.common.provider.JwtAuthProvider;
 import site.shkrr.kreamAuction.controller.dto.UserDto;
-import site.shkrr.kreamAuction.domain.user.common.Role;
+import site.shkrr.kreamAuction.domain.redis.CertificationRedisRepository;
 import site.shkrr.kreamAuction.domain.user.User;
 import site.shkrr.kreamAuction.domain.user.UserRepository;
-import site.shkrr.kreamAuction.exception.smsCertification.CertificationNumExpireException;
+import site.shkrr.kreamAuction.domain.user.common.Role;
 import site.shkrr.kreamAuction.exception.user.*;
 import site.shkrr.kreamAuction.service.authorization.JwtAuthService;
-import site.shkrr.kreamAuction.domain.redis.CertificationRedisRepository;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -41,10 +40,6 @@ public class UserService{
         return userRepository.existsByPhoneNum(phoneNum);
     }
 
-    @Transactional(readOnly = true)
-    private boolean checkCertificationNumIsValid(String phoneNum,String certificationNum) {
-        return certificationRedisRepository.verify(phoneNum,certificationNum)==false;
-    }
 
     @Transactional(readOnly = true)
     private boolean checkLoginPasswordMatch(String loginPassword,String dbPassword) {
@@ -60,10 +55,6 @@ public class UserService{
 
         if(checkPhoneNumDuplicated(requestDto.getPhoneNum())){
             throw new DuplicatePhoneNumException("이미 가입된 휴대폰 번호 입니다.");
-        }
-
-        if(checkCertificationNumIsValid(requestDto.getPhoneNum(), requestDto.getCertificationNum())){
-            throw new CertificationNumExpireException("회원 가입에 대한 인증시간이 만료 되었습니다.");
         }
 
         certificationRedisRepository.removeByKey(requestDto.getPhoneNum());
