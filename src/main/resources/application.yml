@@ -45,5 +45,5 @@ admin:
   password: ${admin_password}
 
 payment:
-  client_key: ${client_key} #toss 카드등록창을 위해 사용되는 key
-  authorization: ${authorization} #toss api 접근시 사용되는 authorization
+  client_key: ${toss_client_key} #toss 카드등록창을 위해 사용되는 key
+  authorization: ${toss_authorization_key} #toss api 접근시 사용되는 authorization
