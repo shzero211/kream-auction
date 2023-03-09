@@ -30,6 +30,8 @@ public class Brand extends BaseTimeEntity {
     public void updateBrandImgPath(String imagePath) {
         this.imagePath=imagePath;
     }
+
+    //테스트용 데이터 생성 메서드
     public BrandInfo toBrandInfo(){
         return BrandInfo.builder()
                 .id(id)

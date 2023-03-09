@@ -3,6 +3,7 @@ package site.shkrr.kreamAuction.domain.product;
 import lombok.*;
 import site.shkrr.kreamAuction.domain.BaseTimeEntity;
 import site.shkrr.kreamAuction.domain.brand.Brand;
+import site.shkrr.kreamAuction.domain.product.common.Color;
 import site.shkrr.kreamAuction.domain.product.common.ReleasePriceType;
 
 import javax.persistence.*;
@@ -26,7 +27,8 @@ public class Product extends BaseTimeEntity {
 
     private LocalDate releaseDate;
 
-    private String color;
+    @Enumerated(EnumType.STRING)
+    private Color color;
 
     private Long releasePrice;
 

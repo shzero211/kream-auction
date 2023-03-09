@@ -26,6 +26,7 @@ import site.shkrr.kreamAuction.domain.paymentrecord.PaymentRecord;
 import site.shkrr.kreamAuction.domain.paymentrecord.PaymentRecordRepository;
 import site.shkrr.kreamAuction.domain.paymentrecord.enums.Status;
 import site.shkrr.kreamAuction.domain.product.ProductRepository;
+import site.shkrr.kreamAuction.domain.product.common.Color;
 import site.shkrr.kreamAuction.domain.product.common.ReleasePriceType;
 import site.shkrr.kreamAuction.domain.user.User;
 import site.shkrr.kreamAuction.domain.user.UserRepository;
@@ -122,7 +123,7 @@ class PaymentControllerTest {
                 .nameKor("나이키 에어포스")
                 .nameEng("nike air force")
                 .modelNum("315122-111")
-                .color("white")
+                .color(Color.WHITE)
                 .releaseDate(LocalDate.now())
                 .releasePrice(120000L)
                 .releasePriceType(ReleasePriceType.KRW)
