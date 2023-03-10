@@ -43,7 +43,7 @@ public class Product extends BaseTimeEntity {
 
     private String imagePath;
 
-    @ManyToOne(optional = false)//조회시 Inner join 강제
+    @ManyToOne(optional = false,fetch = FetchType.LAZY)//조회시 Inner join 강제
     @JoinColumn(name = "BRAND_ID")
     private Brand brand;
 

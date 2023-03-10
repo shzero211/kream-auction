@@ -1,9 +1,6 @@
 package site.shkrr.kreamAuction.domain.trade;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import site.shkrr.kreamAuction.domain.BaseTimeEntity;
 import site.shkrr.kreamAuction.domain.product.Product;
 import site.shkrr.kreamAuction.domain.trade.common.TradeStatus;
@@ -15,6 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
+@Builder
 @Entity
 public class Trade extends BaseTimeEntity {
     @Id
@@ -47,6 +45,5 @@ public class Trade extends BaseTimeEntity {
     private String shippingStartAddress;
 
     private String shippingEndAddress;
-
 
 }
