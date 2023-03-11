@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 import site.shkrr.kreamAuction.controller.dto.AddressDto.AddressInfo;
 import site.shkrr.kreamAuction.controller.dto.ProductDto.ProductInfo;
 import site.shkrr.kreamAuction.controller.dto.TradeDto.BidRequest;
@@ -26,7 +25,6 @@ import site.shkrr.kreamAuction.domain.user.common.Role;
 import java.time.LocalDate;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Transactional
 @SpringBootTest
 class TradeServiceTest {
     @Autowired

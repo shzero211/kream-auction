@@ -33,6 +33,13 @@ public class UserDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class SendSmsRequest{
+        private String phoneNum;
+    }
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class UserSmsConfirmRequestDto{
         private String phoneNum;
         private String certificationNum;
