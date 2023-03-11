@@ -1,8 +1,6 @@
 package site.shkrr.kreamAuction.controller.dto;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import site.shkrr.kreamAuction.domain.address.Address;
 
 import javax.validation.constraints.NotBlank;
@@ -38,5 +36,12 @@ public class AddressDto {
                     .detailAddress(detailAddress)
                     .build();
         }
+    }
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class AddressInfo{
+        private Long id;
     }
 }

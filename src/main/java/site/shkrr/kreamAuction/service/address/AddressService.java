@@ -8,6 +8,8 @@ import site.shkrr.kreamAuction.domain.address.Address;
 import site.shkrr.kreamAuction.domain.address.AddressRepository;
 import site.shkrr.kreamAuction.domain.user.User;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
 public class AddressService {
@@ -21,4 +23,7 @@ public class AddressService {
     }
 
 
+    public Optional<Address> findById(Long id) {
+        return addressRepository.findById(id);
+    }
 }

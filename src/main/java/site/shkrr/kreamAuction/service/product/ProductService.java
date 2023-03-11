@@ -22,7 +22,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final AwsS3Service awsS3Service;
     @Transactional
-    public void createProduct(CreateRequest requestDto, MultipartFile productImg) {
+    public Product createProduct(CreateRequest requestDto, MultipartFile productImg) {
 
         if(!isBrandExist(requestDto.getBrand())){//존재하는 브랜드 인지 확인
             throw new BrandNotFoundException("해당 브랜드는 존재 하지않습니다.");
@@ -32,8 +32,8 @@ public class ProductService {
             String imagePath=awsS3Service.uploadImg(productImg, ImageType.PRODUCT);
             requestDto.updateImgPath(imagePath);
         }
-
-        productRepository.save(requestDto.toEntity());
+        Product product=requestDto.toEntity();
+        return productRepository.save(product);
     }
     public Optional<Product> findById(Long id){
         return productRepository.findById(id);

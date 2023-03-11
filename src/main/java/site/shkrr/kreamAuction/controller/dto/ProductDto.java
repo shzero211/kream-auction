@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import site.shkrr.kreamAuction.controller.dto.BrandDto.BrandInfo;
 import site.shkrr.kreamAuction.domain.product.Product;
+import site.shkrr.kreamAuction.domain.product.common.Color;
 import site.shkrr.kreamAuction.domain.product.common.ReleasePriceType;
 
 import javax.validation.constraints.NotBlank;
@@ -27,7 +28,7 @@ public class ProductDto {
         private String modelNum;
 
         @NotBlank(message = "색상을 입력해주세요.")
-        private String color;
+        private Color color;
 
         @NotNull(message = "출시일을 입력해주세요.")
         @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -87,7 +88,7 @@ public class ProductDto {
         private Long price;
         private String nameKor;
         private String nameEng;
-        private String color;
+        private Color color;
         public ProductInfo(Long id,Long price,String nameKor,String nameEng){
             this.id=id;
             this.price=price;
