@@ -1,13 +1,13 @@
 package site.shkrr.kreamAuction.service.trade;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 import site.shkrr.kreamAuction.controller.dto.AddressDto.AddressInfo;
 import site.shkrr.kreamAuction.controller.dto.ProductDto.ProductInfo;
+import site.shkrr.kreamAuction.controller.dto.TradeDto;
 import site.shkrr.kreamAuction.controller.dto.TradeDto.BidRequest;
 import site.shkrr.kreamAuction.domain.address.Address;
 import site.shkrr.kreamAuction.domain.address.AddressRepository;
@@ -18,17 +18,25 @@ import site.shkrr.kreamAuction.domain.product.ProductRepository;
 import site.shkrr.kreamAuction.domain.product.common.Color;
 import site.shkrr.kreamAuction.domain.product.common.ReleasePriceType;
 import site.shkrr.kreamAuction.domain.trade.Trade;
+import site.shkrr.kreamAuction.domain.trade.TradeRepository;
+import site.shkrr.kreamAuction.domain.trade.common.Status;
 import site.shkrr.kreamAuction.domain.user.User;
 import site.shkrr.kreamAuction.domain.user.UserRepository;
 import site.shkrr.kreamAuction.domain.user.common.Role;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Transactional
+@ActiveProfiles("test")
 @SpringBootTest
 class TradeServiceTest {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private TradeRepository tradeRepository;
 
     @Autowired
     private AddressRepository addressRepository;
@@ -161,5 +169,98 @@ class TradeServiceTest {
         Trade trade=tradeService.salesBid(user,bidRequest);
 
         Assertions.assertEquals("08160 시흥대로 1011동",trade.getShippingStartAddress());
+    }
+
+    @Test
+    @DisplayName("모든 사이즈 즉시 구매가 거래정보 가져오기 테스트")
+    public void getImmediatePurchaseInfoTest() throws InterruptedException {
+        List<Trade> tradeList=new ArrayList<>();
+
+        //10개의 같은 사이즈 구매입찰 거래정보 생성
+        for(int i=1;i<=10;i++){
+            Trade trade=Trade.builder()
+                    .product(product)
+                    .productSize(245)
+                    .shippingStartAddress("address1")
+                    .shippingEndAddress("address1")
+                    .status(Status.sales_bid)
+                    .productPrice(Long.valueOf(100*i))
+                    .build();
+            tradeList.add(trade);
+        }
+
+        Thread.sleep(3000);
+        tradeRepository.saveAll(tradeList);
+        tradeList=new ArrayList<>();
+
+        //3초뒤 10개의 같은 사이즈 구매입찰 거래정보 추가
+        for(int i=1;i<=10;i++){
+            Trade trade=Trade.builder()
+                    .product(product)
+                    .productSize(245)
+                    .status(Status.sales_bid)
+                    .shippingStartAddress("address2")
+                    .shippingEndAddress("address2")
+                    .productPrice(Long.valueOf(100*i))
+                    .build();
+            tradeList.add(trade);
+        }
+
+        tradeRepository.saveAll(tradeList);
+
+        TradeDto.ImmediateRequest requestDto= TradeDto.ImmediateRequest.builder()
+                .productId(product.getId())
+                .build();
+
+        List<Trade> trades=tradeService.getImmediatePurchaseInfo(requestDto);
+        Assertions.assertEquals(100,trades.get(0).getProductPrice());
+        Assertions.assertEquals("address1",trades.get(0).getShippingStartAddress());
+        Assertions.assertEquals(1,trades.size());
+    }
+    @Test
+    @DisplayName("모든 사이즈 즉시 판매가 거래정보 가져오기 테스트")
+    public void getImmediateSalesInfoTest() throws InterruptedException {
+        List<Trade> tradeList=new ArrayList<>();
+
+        //10개의 같은 사이즈 구매입찰 거래정보 생성
+        for(int i=1;i<=10;i++){
+            Trade trade=Trade.builder()
+                    .product(product)
+                    .productSize(245)
+                    .shippingStartAddress("address1")
+                    .shippingEndAddress("address1")
+                    .status(Status.purchase_bid)
+                    .productPrice(Long.valueOf(100*i))
+                    .build();
+            tradeList.add(trade);
+        }
+
+        Thread.sleep(3000);
+        tradeRepository.saveAll(tradeList);
+        tradeList=new ArrayList<>();
+
+        //3초뒤 10개의 같은 사이즈 구매입찰 거래정보 추가
+        for(int i=1;i<=10;i++){
+            Trade trade=Trade.builder()
+                    .product(product)
+                    .productSize(245)
+                    .status(Status.purchase_bid)
+                    .shippingStartAddress("address2")
+                    .shippingEndAddress("address2")
+                    .productPrice(Long.valueOf(100*i))
+                    .build();
+            tradeList.add(trade);
+        }
+
+        tradeRepository.saveAll(tradeList);
+
+        TradeDto.ImmediateRequest requestDto= TradeDto.ImmediateRequest.builder()
+                .productId(product.getId())
+                .build();
+
+        List<Trade> trades=tradeService.getImmediateSalesInfo(requestDto);
+        Assertions.assertEquals(1000,trades.get(0).getProductPrice());
+        Assertions.assertEquals("address1",trades.get(0).getShippingStartAddress());
+        Assertions.assertEquals(1,trades.size());
     }
 }

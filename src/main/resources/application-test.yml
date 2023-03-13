@@ -13,6 +13,7 @@ spring:
   jpa:
     properties:
       hibernate:
+        generate_statistics: true #JPA 쿼리 성능 통계
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect #DB에 전달하는 SQL 형식 지정
     hibernate:
       ddl-auto: create

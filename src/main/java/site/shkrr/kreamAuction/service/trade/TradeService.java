@@ -2,7 +2,9 @@ package site.shkrr.kreamAuction.service.trade;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import site.shkrr.kreamAuction.controller.dto.TradeDto.BidRequest;
+import site.shkrr.kreamAuction.controller.dto.TradeDto.ImmediateRequest;
 import site.shkrr.kreamAuction.domain.address.Address;
 import site.shkrr.kreamAuction.domain.product.Product;
 import site.shkrr.kreamAuction.domain.trade.Trade;
@@ -10,6 +12,9 @@ import site.shkrr.kreamAuction.domain.trade.TradeRepository;
 import site.shkrr.kreamAuction.domain.user.User;
 import site.shkrr.kreamAuction.service.address.AddressService;
 import site.shkrr.kreamAuction.service.product.ProductService;
+
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 public class TradeService {
@@ -21,6 +26,7 @@ public class TradeService {
     /*
     * 구매 입찰
     * */
+    @Transactional
     public Trade purchaseBid(User loginUser, BidRequest requestDto){
 
         Product product=productService.findById(requestDto.getProductInfo().getId())
@@ -42,6 +48,7 @@ public class TradeService {
     /*
     * 판매 입찰
     * */
+    @Transactional
     public Trade salesBid(User loginUser,BidRequest requestDto){
 
         Product product=productService.findById(requestDto.getProductInfo().getId())
@@ -60,6 +67,17 @@ public class TradeService {
         return tradeRepository.save(trade);
     }
 
+    @Transactional
+    public List<Trade> getImmediatePurchaseInfo(ImmediateRequest requestDto){
+        Long productId=requestDto.getProductId();
+        return tradeRepository.getImmediatePurchaseInfo(productId);
+    }
+
+    @Transactional
+    public List<Trade> getImmediateSalesInfo(ImmediateRequest requestDto){
+        Long productId=requestDto.getProductId();
+        return tradeRepository.getImmediateSalesInfo(productId);
+    }
     /*
     * 주소엔티티로 거래 배송주소 생성
     * */

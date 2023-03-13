@@ -5,7 +5,7 @@ import site.shkrr.kreamAuction.controller.dto.AddressDto.AddressInfo;
 import site.shkrr.kreamAuction.controller.dto.ProductDto.ProductInfo;
 import site.shkrr.kreamAuction.domain.product.Product;
 import site.shkrr.kreamAuction.domain.trade.Trade;
-import site.shkrr.kreamAuction.domain.trade.common.TradeStatus;
+import site.shkrr.kreamAuction.domain.trade.common.Status;
 import site.shkrr.kreamAuction.domain.user.User;
 
 import javax.validation.constraints.NotBlank;
@@ -32,9 +32,9 @@ public class TradeDto {
 
         public Trade toEntityForBuyer(User loginUser, Product product,String address) {
             return Trade.builder()
-                    .price(price)
+                    .productPrice(price)
                     .productSize(productSize)
-                    .status(TradeStatus.purchase_bid)
+                    .status(Status.purchase_bid)
                     .product(product)
                     .shippingEndAddress(address)
                     .publisher(loginUser)
@@ -43,9 +43,9 @@ public class TradeDto {
         }
         public Trade toEntityForSeller(User loginUser, Product product,String address) {
             return Trade.builder()
-                    .price(price)
+                    .productPrice(price)
                     .productSize(productSize)
-                    .status(TradeStatus.sales_bid)
+                    .status(Status.sales_bid)
                     .product(product)
                     .shippingStartAddress(address)
                     .publisher(loginUser)
@@ -53,5 +53,11 @@ public class TradeDto {
                     .build();
         }
     }
-
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class ImmediateRequest  {
+        private Long productId;
+    }
 }

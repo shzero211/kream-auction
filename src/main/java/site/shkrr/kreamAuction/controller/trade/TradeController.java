@@ -6,6 +6,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import site.shkrr.kreamAuction.common.utils.Utils;
+import site.shkrr.kreamAuction.controller.dto.TradeDto;
 import site.shkrr.kreamAuction.controller.dto.TradeDto.BidRequest;
 import site.shkrr.kreamAuction.domain.user.User;
 import site.shkrr.kreamAuction.service.trade.TradeService;
@@ -27,5 +28,9 @@ public class TradeController {
     public ResponseEntity salesBid(@AuthenticationPrincipal User loginUser, @Valid @RequestBody BidRequest requestDto){
         tradeService.salesBid(loginUser,requestDto);
         return Utils.response.of("판매 입찰 등록 성공");
+    }
+    //즉시구매
+    public ResponseEntity purchaseImmediate(@AuthenticationPrincipal User loginUser,@Valid @RequestBody TradeDto.ImmediateRequest requestDto){
+        return null;
     }
 }

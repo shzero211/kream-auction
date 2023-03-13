@@ -1,6 +1,6 @@
 package site.shkrr.kreamAuction.domain.trade.common;
 
-public enum TradeStatus {
+public enum Status {
     purchase_bid,
     sales_bid
 }

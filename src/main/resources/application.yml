@@ -7,6 +7,11 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        order_inserts: true
+        order_updates: true
+        batch_versioned_data: true
+        jdbc:
+          batch_size: 5
   mail:
     host: smtp.gmail.com
     port: 587

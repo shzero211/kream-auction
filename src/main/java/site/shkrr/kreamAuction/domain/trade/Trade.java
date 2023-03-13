@@ -1,14 +1,15 @@
 package site.shkrr.kreamAuction.domain.trade;
 
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import site.shkrr.kreamAuction.domain.BaseTimeEntity;
 import site.shkrr.kreamAuction.domain.product.Product;
-import site.shkrr.kreamAuction.domain.trade.common.TradeStatus;
+import site.shkrr.kreamAuction.domain.trade.common.Status;
 import site.shkrr.kreamAuction.domain.user.User;
 
 import javax.persistence.*;
 
-
+@BatchSize(size = 20)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
@@ -16,7 +17,8 @@ import javax.persistence.*;
 @Entity
 public class Trade extends BaseTimeEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "seq_trade", sequenceName = "seq_trade", allocationSize = 20)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,9 +38,9 @@ public class Trade extends BaseTimeEntity {
     private Product product;
 
     @Enumerated(EnumType.STRING)
-    private TradeStatus status;
+    private Status status;
 
-    private Long price;
+    private Long productPrice;
 
     private double productSize;
 
