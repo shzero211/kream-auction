@@ -1,4 +1,4 @@
-package site.shkrr.kreamAuction.controller.payment;
+package site.shkrr.kreamAuction.controller.payment_method;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,21 +17,22 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import site.shkrr.kreamAuction.common.utils.Utils;
 import site.shkrr.kreamAuction.controller.dto.BrandDto.CreateRequest;
-import site.shkrr.kreamAuction.controller.dto.PaymentDto;
+import site.shkrr.kreamAuction.controller.dto.PaymentMethodDto;
+import site.shkrr.kreamAuction.controller.dto.PaymentMethodDto.BillingRequestCardInfo;
 import site.shkrr.kreamAuction.controller.dto.ProductDto;
 import site.shkrr.kreamAuction.controller.dto.UserDto;
 import site.shkrr.kreamAuction.domain.brand.Brand;
 import site.shkrr.kreamAuction.domain.brand.BrandRepository;
-import site.shkrr.kreamAuction.domain.paymentrecord.PaymentRecord;
-import site.shkrr.kreamAuction.domain.paymentrecord.PaymentRecordRepository;
-import site.shkrr.kreamAuction.domain.paymentrecord.enums.Status;
+import site.shkrr.kreamAuction.domain.payment_record.PaymentRecord;
+import site.shkrr.kreamAuction.domain.payment_record.PaymentRecordRepository;
+import site.shkrr.kreamAuction.domain.payment_record.enums.Status;
 import site.shkrr.kreamAuction.domain.product.ProductRepository;
 import site.shkrr.kreamAuction.domain.product.common.Color;
 import site.shkrr.kreamAuction.domain.product.common.ReleasePriceType;
 import site.shkrr.kreamAuction.domain.user.User;
 import site.shkrr.kreamAuction.domain.user.UserRepository;
 import site.shkrr.kreamAuction.service.brand.BrandService;
-import site.shkrr.kreamAuction.service.payment.PaymentService;
+import site.shkrr.kreamAuction.service.payment_method.PaymentMethodService;
 import site.shkrr.kreamAuction.service.product.ProductService;
 import site.shkrr.kreamAuction.service.user.UserService;
 
@@ -63,9 +64,9 @@ class PaymentControllerTest {
     @Autowired
     private ProductRepository productRepository;
     @Autowired
-    private PaymentController paymentController;
+    private PaymentMethodController paymentController;
     @Autowired
-    private PaymentService paymentService;
+    private PaymentMethodService paymentService;
 
     @Autowired
     private UserRepository userRepository;
@@ -144,7 +145,7 @@ class PaymentControllerTest {
         productService.createProduct(productRequest,mockMultipartFileProduct);
 
         //결제 수단 등록 요청 생성
-        PaymentDto.BillingRequestCardInfo billingRequest= PaymentDto.BillingRequestCardInfo.builder()
+        BillingRequestCardInfo billingRequest=  BillingRequestCardInfo.builder()
                 .cardNumber(cardNum)
                 .cardExpirationMonth(cardMonth)
                 .cardExpirationYear(cardYear)
@@ -163,7 +164,7 @@ class PaymentControllerTest {
     }
     @Test
     public void cancelTest() throws Exception {
-        PaymentDto.PaymentCancelRequest request= PaymentDto.PaymentCancelRequest.builder()
+        PaymentMethodDto.PaymentCancelRequest request= PaymentMethodDto.PaymentCancelRequest.builder()
                 .id(paymentRecord.getId())
                 .paymentKey(paymentRecord.getPaymentKey())
                 .cancelReason("사이즈 안맞음")

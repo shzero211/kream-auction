@@ -1,4 +1,4 @@
-package site.shkrr.kreamAuction.service.payment.enums;
+package site.shkrr.kreamAuction.service.payment_method.enums;
 
 import lombok.Getter;
 /*

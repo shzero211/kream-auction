@@ -1,9 +1,9 @@
-package site.shkrr.kreamAuction.domain.paymentrecord;
+package site.shkrr.kreamAuction.domain.payment_record;
 
 import lombok.*;
 import site.shkrr.kreamAuction.domain.BaseTimeEntity;
-import site.shkrr.kreamAuction.domain.payment.Payment;
-import site.shkrr.kreamAuction.domain.paymentrecord.enums.Status;
+import site.shkrr.kreamAuction.domain.payment_method.PaymentMethod;
+import site.shkrr.kreamAuction.domain.payment_record.enums.Status;
 
 import javax.persistence.*;
 
@@ -27,7 +27,7 @@ public class PaymentRecord extends BaseTimeEntity {
     private String totalAmount;
 
     @ManyToOne(fetch = FetchType.LAZY,optional = false)
-    private Payment payment;
+    private PaymentMethod paymentMethod;
 
     private Status status;
 

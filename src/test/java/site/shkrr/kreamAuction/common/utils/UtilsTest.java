@@ -4,7 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import site.shkrr.kreamAuction.controller.dto.PaymentDto.BillingResponse;
+import site.shkrr.kreamAuction.controller.dto.PaymentMethodDto;
+import site.shkrr.kreamAuction.controller.dto.PaymentMethodDto.BillingResponse;
 
 @SpringBootTest
 class UtilsTest {

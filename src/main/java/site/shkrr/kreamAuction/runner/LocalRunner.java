@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import site.shkrr.kreamAuction.controller.dto.UserDto;
+import site.shkrr.kreamAuction.domain.user.UserRepository;
 import site.shkrr.kreamAuction.service.certification.SmsCertificationService;
 import site.shkrr.kreamAuction.service.user.UserService;
 
@@ -26,32 +27,34 @@ public class LocalRunner implements CommandLineRunner {
     @Value("${admin.password}")
     private String adminPassword;
     private final UserService userService;
+    private final UserRepository userRepository;
     private final SmsCertificationService smsCertificationService;
     /*
     * Admin 유저 생성 및 로그인
     * */
     @Override
     public void run(String... args) throws Exception {
-        UserSignUpRequestDto signUpRequestDto=UserSignUpRequestDto
-                .builder()
-                .email(adminEmail)
-                .phoneNum("01039229957")
-                .password(adminPassword)
-                .build();
+        if(userRepository.findByEmail(adminEmail).isEmpty()) {
+            UserSignUpRequestDto signUpRequestDto = UserSignUpRequestDto
+                    .builder()
+                    .email(adminEmail)
+                    .phoneNum("01039229957")
+                    .password(adminPassword)
+                    .build();
 
-        userService.signUpForAdmin(signUpRequestDto);
+            userService.signUpForAdmin(signUpRequestDto);
 
-        UserDto.UserLoginRequestDto loginRequestDto= UserDto.UserLoginRequestDto
-                .builder()
-                .email(adminEmail)
-                .password(adminPassword)
-                .build();
+            UserDto.UserLoginRequestDto loginRequestDto = UserDto.UserLoginRequestDto
+                    .builder()
+                    .email(adminEmail)
+                    .password(adminPassword)
+                    .build();
 
-        Map<String,String> tokenMap =userService.login(loginRequestDto);
+            Map<String, String> tokenMap = userService.login(loginRequestDto);
 
-        for(String key : tokenMap.keySet()){
-            log.info(key+","+tokenMap.get(key));
+            for (String key : tokenMap.keySet()) {
+                log.info(key + "," + tokenMap.get(key));
+            }
         }
-
     }
 }

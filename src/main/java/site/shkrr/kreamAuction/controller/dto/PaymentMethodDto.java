@@ -2,16 +2,16 @@ package site.shkrr.kreamAuction.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
-import site.shkrr.kreamAuction.domain.payment.Payment;
-import site.shkrr.kreamAuction.domain.payment.enums.Status;
-import site.shkrr.kreamAuction.domain.paymentrecord.PaymentRecord;
+import site.shkrr.kreamAuction.domain.payment_method.PaymentMethod;
+import site.shkrr.kreamAuction.domain.payment_method.enums.Status;
+import site.shkrr.kreamAuction.domain.payment_record.PaymentRecord;
 import site.shkrr.kreamAuction.domain.user.User;
 
 import java.util.Date;
 
-import static site.shkrr.kreamAuction.domain.paymentrecord.enums.Status.*;
+import static site.shkrr.kreamAuction.domain.payment_record.enums.Status.*;
 
-public class PaymentDto {
+public class PaymentMethodDto {
 
     @Getter
     @Builder
@@ -67,15 +67,15 @@ public class PaymentDto {
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class PaymentSaveInfo{
+    public static class PaymentMethodSaveInfo{
         private String customerKey;
         private String billingKey;
 
         private String bankName;
 
         private String bankAccount;
-        public Payment toEntity(User user){
-            return Payment.builder()
+        public PaymentMethod toEntity(User user){
+            return PaymentMethod.builder()
                     .customerKey(customerKey)
                     .billingKey(billingKey)
                     .user(user)
@@ -90,7 +90,7 @@ public class PaymentDto {
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class PayForPaymentRequest{
+    public static class PayForPaymentMethodRequest{
         private String customerKey; //고객아이디
         private Long amount; //결제 금액
         private String orderId; //주문아이디(6~64자,영문 대소문자,숫자,특수문자 - , _ , = , . ,@)
@@ -102,14 +102,14 @@ public class PaymentDto {
     @JsonIgnoreProperties(ignoreUnknown = true)
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class PayForPaymentResponse{
+    public static class PayForPaymentMethodResponse{
         private String paymentKey; //결제 정보키(결제 취소시 사용됨)
         private String orderId; //주문 아이디
         private String orderName; //주문명
         private String totalAmount; //결제금액
-        public PaymentRecord toPaymentRecord(Payment payment,String encryptPaymentKey){
+        public PaymentRecord toPaymentRecord(PaymentMethod paymentMethod, String encryptPaymentKey){
             return PaymentRecord.builder()
-                    .payment(payment)
+                    .paymentMethod(paymentMethod)
                     .paymentKey(encryptPaymentKey)
                     .orderId(orderId)
                     .orderName(orderName)

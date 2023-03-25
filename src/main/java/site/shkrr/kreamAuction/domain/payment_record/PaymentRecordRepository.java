@@ -1,4 +1,4 @@
-package site.shkrr.kreamAuction.domain.paymentrecord;
+package site.shkrr.kreamAuction.domain.payment_record;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

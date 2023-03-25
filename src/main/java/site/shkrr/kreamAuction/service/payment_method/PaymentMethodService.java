@@ -1,54 +1,54 @@
-package site.shkrr.kreamAuction.service.payment;
+package site.shkrr.kreamAuction.service.payment_method;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.shkrr.kreamAuction.common.utils.Utils;
+import site.shkrr.kreamAuction.controller.dto.PaymentMethodDto.*;
 import site.shkrr.kreamAuction.controller.dto.ProductDto.ProductInfo;
-import site.shkrr.kreamAuction.domain.payment.Payment;
-import site.shkrr.kreamAuction.domain.payment.PaymentRepository;
-import site.shkrr.kreamAuction.domain.payment.enums.Status;
-import site.shkrr.kreamAuction.domain.paymentrecord.PaymentRecord;
+import site.shkrr.kreamAuction.domain.payment_method.PaymentMethod;
+
+import site.shkrr.kreamAuction.domain.payment_method.PaymentMethodRepository;
+import site.shkrr.kreamAuction.domain.payment_method.enums.Status;
+import site.shkrr.kreamAuction.domain.payment_record.PaymentRecord;
 import site.shkrr.kreamAuction.domain.product.Product;
 import site.shkrr.kreamAuction.domain.user.User;
 import site.shkrr.kreamAuction.exception.payment.PaymentException;
 import site.shkrr.kreamAuction.exception.payment.RequestBillingKeyException;
 import site.shkrr.kreamAuction.service.encrypt.EncryptService;
-import site.shkrr.kreamAuction.service.payment.enums.BankNames;
-import site.shkrr.kreamAuction.service.paymentrecord.PaymentRecordService;
+import site.shkrr.kreamAuction.service.payment_method.enums.BankNames;
+import site.shkrr.kreamAuction.service.payment_record.PaymentRecordService;
 import site.shkrr.kreamAuction.service.product.ProductService;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Optional;
 
-import static site.shkrr.kreamAuction.controller.dto.PaymentDto.*;
 
 @RequiredArgsConstructor
 @Service
-public class PaymentService {
+public class PaymentMethodService {
 
     @Value("${payment.authorization}")
     private String tossHttpAuthorization;
     private final EncryptService encryptService;
     private final ProductService productService;
     private final PaymentRecordService paymentRecordService;
-    private final PaymentRepository paymentRepository;
+    private final PaymentMethodRepository paymentMethodRepository;
 
     /*
     *client 정보로  대표 결제 수단 등록
     * */
     @Transactional
-    public void save(BillingRequest requestDto,User loginUser){
+    public void save(BillingRequest requestDto, User loginUser){
 
-        PaymentSaveInfo paymentInfo=requestBillingKey(requestDto);
+        PaymentMethodSaveInfo paymentInfo=requestBillingKey(requestDto);
 
-        Payment payment =paymentInfo.toEntity(loginUser);
+        PaymentMethod paymentMethod =paymentInfo.toEntity(loginUser);
 
-        paymentRepository.save(payment);
+        paymentMethodRepository.save(paymentMethod);
     }
 
     /*
@@ -57,11 +57,11 @@ public class PaymentService {
     @Transactional
     public void saveByCard(BillingRequestCardInfo requestDto,User loginUser){
 
-        PaymentSaveInfo paymentInfo=requestBillingKeyByCardInfo(requestDto);
+        PaymentMethodSaveInfo paymentInfo=requestBillingKeyByCardInfo(requestDto);
 
-        Payment payment =paymentInfo.toEntity(loginUser);
+        PaymentMethod paymentMethod =paymentInfo.toEntity(loginUser);
 
-        paymentRepository.save(payment);
+        paymentMethodRepository.save(paymentMethod);
     }
 
     /*
@@ -75,10 +75,10 @@ public class PaymentService {
             throw new RuntimeException("일치하는 상품이 존재하지 않습니다.");
         }
         //로그인 유저의 대표 결제 수단 가져오기
-        Payment payment=paymentRepository.findByUserAndStatus(loginUser, Status.MAIN_CARD).orElseThrow(()->new RuntimeException("대표 결제수단이 등록되어 있지않습니다."));
+        PaymentMethod paymentMethod=paymentMethodRepository.findByUserAndStatus(loginUser, Status.MAIN_CARD).orElseThrow(()->new RuntimeException("대표 결제수단이 등록되어 있지않습니다."));
 
         //결제
-        return payByBillingKey(payment,productInfo);
+        return payByBillingKey(paymentMethod,productInfo);
     }
 
     /*
@@ -132,7 +132,7 @@ public class PaymentService {
      * SDK AuthKey 로 빌링키 발급
      * */
     @Transactional
-    public PaymentSaveInfo requestBillingKey(BillingRequest requestDto){
+    public PaymentMethodSaveInfo requestBillingKey(BillingRequest requestDto){
 
         //Toss 에 RequestDto 정보를 통한 BillingKey 발급 요청 생성
         HttpRequest request = HttpRequest.newBuilder()
@@ -162,7 +162,7 @@ public class PaymentService {
         String  encryptBillingKey=encryptService.encryptAES256(responseBody.getBillingKey());
         String encryptCustomerKey=encryptService.encryptAES256(responseBody.getCustomerKey());
 
-        PaymentSaveInfo paymentSaveInfo=PaymentSaveInfo.builder()
+        PaymentMethodSaveInfo paymentSaveInfo=PaymentMethodSaveInfo.builder()
                 .customerKey(encryptCustomerKey)
                 .billingKey(encryptBillingKey)
                 .bankName(bankName)
@@ -176,7 +176,7 @@ public class PaymentService {
      * 카드정보로 빌링키 발급
      * */
     @Transactional
-    public PaymentSaveInfo requestBillingKeyByCardInfo(BillingRequestCardInfo requestDto){
+    public PaymentMethodSaveInfo requestBillingKeyByCardInfo(BillingRequestCardInfo requestDto){
         //customerKey 랜덤 생성후 요청에 삽입
         String customerKey=Utils.random.makeRandomKey();
         requestDto.addCustomerKey(customerKey);
@@ -209,7 +209,7 @@ public class PaymentService {
         String  encryptBillingKey=encryptService.encryptAES256(responseBody.getBillingKey());
         String encryptCustomerKey=encryptService.encryptAES256(responseBody.getCustomerKey());
 
-        PaymentSaveInfo paymentSaveInfo=PaymentSaveInfo.builder()
+        PaymentMethodSaveInfo paymentSaveInfo=PaymentMethodSaveInfo.builder()
                 .customerKey(encryptCustomerKey)
                 .billingKey(encryptBillingKey)
                 .bankName(bankName)
@@ -234,12 +234,12 @@ public class PaymentService {
     /*
     * 결제 처리 로직
     * */
-    private PaymentRecord payByBillingKey(Payment payment,ProductInfo productInfo) {
+    private PaymentRecord payByBillingKey(PaymentMethod paymentMethod,ProductInfo productInfo) {
 
-        String decryptBillingKey = encryptService.decryptAES256(payment.getBillingKey());
-        String decryptCustomerKey = encryptService.decryptAES256(payment.getCustomerKey());
+        String decryptBillingKey = encryptService.decryptAES256(paymentMethod.getBillingKey());
+        String decryptCustomerKey = encryptService.decryptAES256(paymentMethod.getCustomerKey());
 
-        PayForPaymentRequest request =payment.toPayForPaymentRequest(productInfo,decryptCustomerKey);
+        PayForPaymentMethodRequest request =paymentMethod.toPayForPaymentMethodRequest(productInfo,decryptCustomerKey);
 
         //토스에 전송할 자동 결제 승인 요청(Path + RequestBody)
         HttpRequest httpRequest=HttpRequest.newBuilder()
@@ -250,11 +250,11 @@ public class PaymentService {
                 .build();
 
         HttpResponse<String> response= null;
-        PayForPaymentResponse responseBody=null;
+        PayForPaymentMethodResponse responseBody=null;
 
         try {//요청 전송
             response = HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            responseBody=Utils.json.toObj(response.body(), PayForPaymentResponse.class);
+            responseBody=Utils.json.toObj(response.body(), PayForPaymentMethodResponse.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -265,7 +265,7 @@ public class PaymentService {
         }
 
         //결제 내역 저장
-        return paymentRecordService.save(responseBody,payment);
+        return paymentRecordService.save(responseBody,paymentMethod);
     }
 
 

@@ -1,11 +1,12 @@
-package site.shkrr.kreamAuction.domain.payment;
+package site.shkrr.kreamAuction.domain.payment_method;
 
 import lombok.*;
 import site.shkrr.kreamAuction.common.utils.Utils;
-import site.shkrr.kreamAuction.controller.dto.PaymentDto.PayForPaymentRequest;
+import site.shkrr.kreamAuction.controller.dto.PaymentMethodDto;
+import site.shkrr.kreamAuction.controller.dto.PaymentMethodDto.PayForPaymentMethodRequest;
 import site.shkrr.kreamAuction.controller.dto.ProductDto.ProductInfo;
 import site.shkrr.kreamAuction.domain.BaseTimeEntity;
-import site.shkrr.kreamAuction.domain.payment.enums.Status;
+import site.shkrr.kreamAuction.domain.payment_method.enums.Status;
 import site.shkrr.kreamAuction.domain.user.User;
 
 import javax.persistence.*;
@@ -15,7 +16,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Entity
-public class Payment extends BaseTimeEntity {
+public class PaymentMethod extends BaseTimeEntity {
     @Id
     @GeneratedValue
     private Long id;
@@ -34,7 +35,7 @@ public class Payment extends BaseTimeEntity {
     private String bankName;
 
     private String bankAccount;
-    public PayForPaymentRequest toPayForPaymentRequest(ProductInfo productInfo,String decryptCustomerKey) {
+    public PayForPaymentMethodRequest toPayForPaymentMethodRequest(ProductInfo productInfo, String decryptCustomerKey) {
 
         StringBuilder orderNameBuilder=new StringBuilder();
 
@@ -42,7 +43,7 @@ public class Payment extends BaseTimeEntity {
 
         String newOrderId=Utils.random.makeRandomKey();
 
-        return PayForPaymentRequest.builder()
+        return PayForPaymentMethodRequest.builder()
                 .customerKey(decryptCustomerKey)
                 .amount(productInfo.getPrice())
                 .orderId(newOrderId)
