@@ -24,9 +24,10 @@ public class PaymentMethodDto {
 
     @Getter
     @Builder
+    @JsonIgnoreProperties(ignoreUnknown = true)
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static  class BillingRequestCardInfo{
+    public static  class CardInfo{
         private String customerKey;
         private String cardNumber;
         private String cardExpirationYear;

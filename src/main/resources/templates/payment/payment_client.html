@@ -13,8 +13,8 @@
       tossPayments.requestBillingAuth('카드', { // 결제 수단 파라미터
       // 빌링키 발급 요청을 위한 파라미터
       customerKey: customerKey,
-      successUrl: 'http://localhost:8080/payment',
-      failUrl: 'http://localhost:8080/payment/fail',
+      successUrl: 'http://localhost:8080/paymentMethod',
+      failUrl: 'http://localhost:8080/paymentMethod/fail',
       })
       .catch(function (error) {
         if (error.code === 'USER_CANCEL') {

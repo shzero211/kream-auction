@@ -42,43 +42,27 @@ public class PaymentMethodService {
     *client 정보로  대표 결제 수단 등록
     * */
     @Transactional
-    public void save(BillingRequest requestDto, User loginUser){
+    public void save(BillingRequest billingRequest, User loginUser){
 
-        PaymentMethodSaveInfo paymentInfo=requestBillingKey(requestDto);
+        PaymentMethodSaveInfo paymentInfo=requestBillingKey(billingRequest);
 
         PaymentMethod paymentMethod =paymentInfo.toEntity(loginUser);
 
         paymentMethodRepository.save(paymentMethod);
     }
 
+
     /*
-     * 카드로 대표 결제 수단 등록
+     * 카드번호 로 대표 결제 수단 등록
      * */
     @Transactional
-    public void saveByCard(BillingRequestCardInfo requestDto,User loginUser){
+    public PaymentMethod save(CardInfo cardInfo,User loginUser){
 
-        PaymentMethodSaveInfo paymentInfo=requestBillingKeyByCardInfo(requestDto);
+        PaymentMethodSaveInfo paymentInfo=requestBillingKeyByCardInfo(cardInfo);
 
         PaymentMethod paymentMethod =paymentInfo.toEntity(loginUser);
 
-        paymentMethodRepository.save(paymentMethod);
-    }
-
-    /*
-    * 대표 결제 수단으로 결제
-    * */
-    @Transactional
-    public PaymentRecord pay(User loginUser, ProductInfo productInfo){
-
-        //상품정보 정합성 확인
-        if(!isValidProductInfo(productInfo)){
-            throw new RuntimeException("일치하는 상품이 존재하지 않습니다.");
-        }
-        //로그인 유저의 대표 결제 수단 가져오기
-        PaymentMethod paymentMethod=paymentMethodRepository.findByUserAndStatus(loginUser, Status.MAIN_CARD).orElseThrow(()->new RuntimeException("대표 결제수단이 등록되어 있지않습니다."));
-
-        //결제
-        return payByBillingKey(paymentMethod,productInfo);
+        return paymentMethodRepository.save(paymentMethod);
     }
 
     /*
@@ -176,22 +160,22 @@ public class PaymentMethodService {
      * 카드정보로 빌링키 발급
      * */
     @Transactional
-    public PaymentMethodSaveInfo requestBillingKeyByCardInfo(BillingRequestCardInfo requestDto){
+    public PaymentMethodSaveInfo requestBillingKeyByCardInfo(CardInfo cardInfo){
         //customerKey 랜덤 생성후 요청에 삽입
         String customerKey=Utils.random.makeRandomKey();
-        requestDto.addCustomerKey(customerKey);
+        cardInfo.addCustomerKey(customerKey);
 
         //Toss 에 RequestDto 정보를 통한 BillingKey 발급 요청 생성
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.tosspayments.com/v1/billing/authorizations/card"))
                 .header("Authorization",tossHttpAuthorization )
                 .header("Content-Type", "application/json")
-                .method("POST", HttpRequest.BodyPublishers.ofString(Utils.json.toJson(requestDto)))
+                .method("POST", HttpRequest.BodyPublishers.ofString(Utils.json.toJson(cardInfo)))
                 .build();
 
         HttpResponse<String> response = null;
         BillingResponse responseBody=null;
-
+        System.out.println(cardInfo.getCustomerKey()+" "+cardInfo.getCardNumber()+" "+cardInfo.getCardExpirationYear()+" "+cardInfo.getCardExpirationMonth()+" "+cardInfo.getCustomerIdentityNumber());
         try {//BillingKey 발급 요청
             response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
             responseBody=Utils.json.toObj(response.body(), BillingResponse.class);
@@ -217,55 +201,6 @@ public class PaymentMethodService {
                 .build();
 
         return paymentSaveInfo;
-    }
-
-
-    /*
-    * 결제전 요청한 상품정보,DB 정보와 일치 확인
-    * */
-    private boolean isValidProductInfo(ProductInfo productInfo) {
-        Optional<Product> product =productService.findById(productInfo.getId());
-        if(product.isEmpty()||!product.get().getNameKor().equals(productInfo.getNameKor())||!product.get().getNameEng().equals(productInfo.getNameEng())){
-            return false;
-        }
-        return true;
-    }
-
-    /*
-    * 결제 처리 로직
-    * */
-    private PaymentRecord payByBillingKey(PaymentMethod paymentMethod,ProductInfo productInfo) {
-
-        String decryptBillingKey = encryptService.decryptAES256(paymentMethod.getBillingKey());
-        String decryptCustomerKey = encryptService.decryptAES256(paymentMethod.getCustomerKey());
-
-        PayForPaymentMethodRequest request =paymentMethod.toPayForPaymentMethodRequest(productInfo,decryptCustomerKey);
-
-        //토스에 전송할 자동 결제 승인 요청(Path + RequestBody)
-        HttpRequest httpRequest=HttpRequest.newBuilder()
-                .uri(URI.create("https://api.tosspayments.com/v1/billing/"+ decryptBillingKey))
-                .header("Authorization",tossHttpAuthorization)
-                .header("Content-Type","application/json")
-                .method("POST",HttpRequest.BodyPublishers.ofString(Utils.json.toJson(request)))
-                .build();
-
-        HttpResponse<String> response= null;
-        PayForPaymentMethodResponse responseBody=null;
-
-        try {//요청 전송
-            response = HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            responseBody=Utils.json.toObj(response.body(), PayForPaymentMethodResponse.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //결제 에러 발생시 응답받은 Json 정보로 처리
-        if(responseBody.getOrderId()==null||responseBody.getPaymentKey()==null){
-            throw new PaymentException(response.body(),"결제 실패 에러 발생");
-        }
-
-        //결제 내역 저장
-        return paymentRecordService.save(responseBody,paymentMethod);
     }
 
 

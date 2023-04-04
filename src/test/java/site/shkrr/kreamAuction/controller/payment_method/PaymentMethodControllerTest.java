@@ -10,19 +10,27 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import site.shkrr.kreamAuction.common.utils.Utils;
 import site.shkrr.kreamAuction.controller.dto.BrandDto.CreateRequest;
 import site.shkrr.kreamAuction.controller.dto.PaymentMethodDto;
-import site.shkrr.kreamAuction.controller.dto.PaymentMethodDto.BillingRequestCardInfo;
+import site.shkrr.kreamAuction.controller.dto.PaymentMethodDto.CardInfo;
 import site.shkrr.kreamAuction.controller.dto.ProductDto;
 import site.shkrr.kreamAuction.controller.dto.UserDto;
 import site.shkrr.kreamAuction.domain.brand.Brand;
 import site.shkrr.kreamAuction.domain.brand.BrandRepository;
+import site.shkrr.kreamAuction.domain.payment_method.PaymentMethod;
+import site.shkrr.kreamAuction.domain.payment_method.PaymentMethodRepository;
 import site.shkrr.kreamAuction.domain.payment_record.PaymentRecord;
 import site.shkrr.kreamAuction.domain.payment_record.PaymentRecordRepository;
 import site.shkrr.kreamAuction.domain.payment_record.enums.Status;
@@ -32,7 +40,9 @@ import site.shkrr.kreamAuction.domain.product.common.ReleasePriceType;
 import site.shkrr.kreamAuction.domain.user.User;
 import site.shkrr.kreamAuction.domain.user.UserRepository;
 import site.shkrr.kreamAuction.service.brand.BrandService;
+import site.shkrr.kreamAuction.service.payment.PaymentService;
 import site.shkrr.kreamAuction.service.payment_method.PaymentMethodService;
+import site.shkrr.kreamAuction.service.payment_method.enums.BankNames;
 import site.shkrr.kreamAuction.service.product.ProductService;
 import site.shkrr.kreamAuction.service.user.UserService;
 
@@ -41,36 +51,24 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Collections;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@WithMockUser(username = "shzero211@naver.com",authorities = "ROLE_ADMIN")
 @Transactional
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class PaymentControllerTest {
+class PaymentMethodControllerTest {
 
     @Autowired
     private BrandService brandService;
-
-    @Autowired
-    private BrandRepository brandRepository;
-
     @Autowired
     private ProductService productService;
-
     @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private PaymentMethodController paymentController;
-    @Autowired
-    private PaymentMethodService paymentService;
-
-    @Autowired
-    private UserRepository userRepository;
-
+    private PaymentMethodRepository paymentMethodRepository;
     @Autowired
     private UserService userService;
 
@@ -79,18 +77,23 @@ class PaymentControllerTest {
 
     @Autowired
     private PaymentRecordRepository paymentRecordRepository;
-    private User loginUser;
+    private UserDetails loginUser;
     private PaymentRecord paymentRecord;
-    @Value("${test.card_num}")
+
+    @Value("${test_card_num}")
     private String cardNum;
-    @Value("${test.card_year}")
+
+    @Value("${test_card_year}")
     private String cardYear;
-    @Value("${test.card_month}")
+
+    @Value("${test_card_month}")
     private String cardMonth;
-    @Value("${test.card_password}")
-    private String cardPassword;
-    @Value("${test.card_customer_id}")
+
+    @Value("${test_card_customer_id}")
     private String customerId;
+
+    @Value("${test_card_password}")
+    private String cardPassword;
 
     @BeforeAll
     public void setUp() throws IOException {
@@ -143,9 +146,20 @@ class PaymentControllerTest {
 
         //상품 엔티티 생성
         productService.createProduct(productRequest,mockMultipartFileProduct);
+    }
+
+    /*
+    * 카드번호로 결제수단 등록 테스트
+    * */
+    @Test
+    public void saveTest() throws Exception {
+
+        //로그인 처리
+        Authentication authentication = new UsernamePasswordAuthenticationToken(loginUser,"",loginUser.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         //결제 수단 등록 요청 생성
-        BillingRequestCardInfo billingRequest=  BillingRequestCardInfo.builder()
+        CardInfo cardInfo=  CardInfo.builder()
                 .cardNumber(cardNum)
                 .cardExpirationMonth(cardMonth)
                 .cardExpirationYear(cardYear)
@@ -154,13 +168,18 @@ class PaymentControllerTest {
                 .build();
 
         //결제 수단 등록
-        paymentService.saveByCard(billingRequest,loginUser);
+        MvcResult result=mockMvc.perform(post("/paymentMethod/save")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(Utils.json.toJson(cardInfo))
+                .accept(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                )
+                .andReturn();
 
-        //결제에 필요한 상품정보
-        ProductDto.ProductInfo productInfo = productRepository.getProductInfoById(3L);
+        String bankAccount = cardNum.substring(0, 8) + "****" + cardNum.substring(12, 15) + "*";
 
-        //결제
-        paymentRecord=paymentService.pay(loginUser,productInfo);
+        PaymentMethod paymentMethod=paymentMethodRepository.findByBankAccount(bankAccount);
+
+        Assertions.assertEquals(BankNames.KBANK.toString(),paymentMethod.getBankName());
     }
     @Test
     public void cancelTest() throws Exception {
@@ -175,8 +194,6 @@ class PaymentControllerTest {
                         .content(Utils.json.toJson(request))
                          .accept(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andReturn();
-
-        System.out.println(result.getResponse().getContentAsString());
 
         PaymentRecord canceledPaymentRecord=paymentRecordRepository.findById(request.getId()).get();
         Assertions.assertEquals(Status.CANCELLED,canceledPaymentRecord.getStatus());
